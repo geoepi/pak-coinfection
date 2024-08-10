@@ -1,0 +1,200 @@
+---
+title: "Time Calibrated Phylogenies"
+description: "Construction and evaluation of time calibrated trees for each serotype"
+format:
+  html: 
+    df-print: kable
+    code-fold: show
+    code-summary: "Hide code"
+    code-overflow: wrap
+    toc-title: Page Contents
+    toc: true
+    toc-depth: 2
+    toc-location: right
+    number-sections: false
+    html-math-method: katex
+    smooth-scroll: true
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+```{=html}
+<style type="text/css">
+
+body, td {
+   font-size: 13pt;
+}
+code.r{
+  font-size: 9pt;
+}
+pre {
+  font-size: 11pt
+}
+</style>
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(knitr)
+knit_print.gt <- function(x, ...) {
+  stringr::str_c(
+    "<div style='all:initial';>\n", 
+    gt::as_raw_html(x), 
+    "\n</div>"
+  ) |> 
+    knitr::asis_output()
+    
+}
+registerS3method(
+  "knit_print", 'gt_tbl', knit_print.gt, 
+  envir = asNamespace("gt") 
+)
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(here)
+library(tidyverse)
+options(dplyr.summarise.inform = FALSE)
+library(ape)
+library(ggtree)
+library(ggmap)
+library(ggspatial)
+library(dendextend)
+library(pals)
+library(gt)
+
+## Custom Functions
+source(here("R/utilities.R"))
+source_dir(here("R"))
+
+```
+
+## Time Calibrated Phylogenies
+
+
+### Serotype A   
+Check tree model statistics the *get_tracer_stats()* function calculates similar summary statistics as the Tracer software typically used with BEAST.  
+```{r message=FALSE, warning=FALSE}
+check_stats <- get_tracer_stats(here("local/beast/a_1/As_rev.log"))
+
+keep_stats <- c("joint", "prior", "likelihood", "treeModel.rootHeight", "age.root.",
+                "treeLength", "tmrca.fmd_a_rev.", "clock.rate")
+
+check_stats %>%
+  filter(Parameter %in% keep_stats) %>%
+  gt() %>%
+  tab_header(
+    title = md("Serotype A Stats")) %>%
+  cols_width(starts_with("Parameter") ~ px(200),
+             starts_with("label") ~ px(60),
+             everything() ~ px(95)) %>%
+  tab_options(table.font.size = "small",
+              row_group.font.size = "small",
+              stub.font.size = "small",
+              column_labels.font.size = "medium",
+              heading.title.font.size = "large",
+              data_row.padding = px(2),
+              heading.title.font.weight = "bold",
+              column_labels.font.weight = "bold") %>%
+  opt_stylize(style = 6, color = 'gray')
+```
+
+Load MCC tree
+```{r fig.width=10, fig.height=18}
+sero_A.tree <- read.nexus(here("local/beast/a_1/As.mcc.tre"))
+
+plot_time_tree(sero_A.tree, check_stats)
+
+```
+
+FMDV Effective Population Size    
+Trees were run using several different clock and prior choices, all showed flat-line Ne.  The one here was the simplest, coalescent with contant population size.    
+```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
+phylodynamic_process(sero_A.tree, check_stats, x_limits = c("2009-01-01", "2017-01-01"))
+```
+
+
+### Serotype Asia1   
+```{r}
+check_stats <- get_tracer_stats(here("local/beast/asia1_1/Asia1s.log"))
+
+keep_stats <- c("joint", "prior", "likelihood", "treeModel.rootHeight", "age.root.",
+                "treeLength", "tmrca.fmd_a_rev.", "clock.rate")
+
+check_stats %>%
+  filter(Parameter %in% keep_stats) %>%
+  gt() %>%
+  tab_header(
+    title = md("Serotype Asia1 Stats")) %>%
+  cols_width(starts_with("Parameter") ~ px(200),
+             starts_with("label") ~ px(60),
+             everything() ~ px(95)) %>%
+  tab_options(table.font.size = "small",
+              row_group.font.size = "small",
+              stub.font.size = "small",
+              column_labels.font.size = "medium",
+              heading.title.font.size = "large",
+              data_row.padding = px(2),
+              heading.title.font.weight = "bold",
+              column_labels.font.weight = "bold") %>%
+  opt_stylize(style = 6, color = 'gray')
+```
+
+Load MCC tree
+```{r fig.width=10, fig.height=18}
+sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/asia1.mcc.tre")) 
+plot_time_tree(sero_Asia1.tree, check_stats, legend_pos = c(0.2, 0.5))
+
+```
+
+FMDV Effective Population Size    
+Flat Ne, like the other serotypes  
+```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
+phylodynamic_process(sero_Asia1.tree, check_stats, x_limits = c("2011-01-01", "2013-01-01"))
+```
+
+### Serotype O   
+```{r}
+check_stats <- get_tracer_stats(here("local/beast/o_1/sero_0.log"))
+
+keep_stats <- c("joint", "prior", "likelihood", "treeModel.rootHeight", "age.root.",
+                "treeLength", "tmrca.fmd_a_rev.", "clock.rate")
+
+check_stats %>%
+  filter(Parameter %in% keep_stats) %>%
+  gt() %>%
+  tab_header(
+    title = md("Serotype O Stats")) %>%
+  cols_width(starts_with("Parameter") ~ px(200),
+             starts_with("label") ~ px(60),
+             everything() ~ px(95)) %>%
+  tab_options(table.font.size = "small",
+              row_group.font.size = "small",
+              stub.font.size = "small",
+              column_labels.font.size = "medium",
+              heading.title.font.size = "large",
+              data_row.padding = px(2),
+              heading.title.font.weight = "bold",
+              column_labels.font.weight = "bold") %>%
+  opt_stylize(style = 6, color = 'gray')
+```
+
+Load MCC tree   
+```{r fig.width=10, fig.height=18}
+sero_O.tree <- read.nexus(here("local/beast/o_1/Os.mcc.tre"))
+
+plot_time_tree(sero_O.tree, check_stats, legend_pos = c(0.2, 0.5))
+
+```
+
+FMDV Effective Population Size  
+Flat Ne, like the other serotypes  
+```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
+phylodynamic_process(sero_O.tree, check_stats, x_limits = c("2011-01-01", "2013-01-01"))
+```
+
+
+
+
+
+
+
