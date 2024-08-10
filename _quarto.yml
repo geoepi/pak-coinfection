@@ -16,7 +16,7 @@ website:
       - href: https://geoepi.github.io/
         text: GeoEpi
       - icon: github
-        href: https://github.com/geoepi/fmdv-preclinical
+        href: https://github.com/geoepi/pak-coinfection
   page-footer:
     right: "Built with [Quarto](https://quarto.org/)"
 
