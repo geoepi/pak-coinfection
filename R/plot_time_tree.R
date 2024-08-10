@@ -49,7 +49,7 @@ plot_time_tree <- function(tree, stats, legend_pos = c(0.3, 0.7)) {
         legend.key.width = unit(3,"line"),
         legend.text = element_text(size=20, face="bold"),
         legend.title = element_text(size=25, face="bold"), 
-        plot.margin = unit(c(1,8,1,1), "mm"))
+        plot.margin = unit(c(1,8,1,0.1), "mm"))
   
   return(p)
 }

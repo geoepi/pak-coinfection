@@ -68,10 +68,8 @@ source_dir(here("R"))
 
 ```
 
-## Time Calibrated Phylogenies
 
-
-### Serotype A   
+## Serotype A   
 Check tree model statistics the *get_tracer_stats()* function calculates similar summary statistics as the Tracer software typically used with BEAST.  
 ```{r message=FALSE, warning=FALSE}
 check_stats <- get_tracer_stats(here("local/beast/a_1/As_rev.log"))
@@ -109,11 +107,11 @@ plot_time_tree(sero_A.tree, check_stats)
 FMDV Effective Population Size    
 Trees were run using several different clock and prior choices, all showed flat-line Ne.  The one here was the simplest, coalescent with contant population size.    
 ```{r fig.width=8, fig.height=6, warning=FALSE, message=FALSE}
-phylodynamic_process(sero_A.tree, check_stats, x_limits = c("2009-01-01", "2017-01-01"))
+phylodynamic_process(sero_A.tree, check_stats, x_limits = c("2011-01-01", "2013-01-01"))
 ```
 
 
-### Serotype Asia1   
+## Serotype Asia1   
 ```{r}
 check_stats <- get_tracer_stats(here("local/beast/asia1_1/Asia1s.log"))
 
@@ -152,7 +150,7 @@ Flat Ne, like the other serotypes
 phylodynamic_process(sero_Asia1.tree, check_stats, x_limits = c("2011-01-01", "2013-01-01"))
 ```
 
-### Serotype O   
+## Serotype O   
 ```{r}
 check_stats <- get_tracer_stats(here("local/beast/o_1/sero_0.log"))
 
