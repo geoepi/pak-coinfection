@@ -1,0 +1,215 @@
+---
+title: "Networks"
+description: "Inferred transmission networks from time calibrated phylogenies"
+format:
+  html: 
+    df-print: kable
+    code-fold: show
+    code-summary: "Hide code"
+    code-overflow: wrap
+    toc-title: Page Contents
+    toc: true
+    toc-depth: 2
+    toc-location: right
+    number-sections: false
+    html-math-method: katex
+    smooth-scroll: true
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+```{=html}
+<style type="text/css">
+
+body, td {
+   font-size: 13pt;
+}
+code.r{
+  font-size: 9pt;
+}
+pre {
+  font-size: 11pt
+}
+</style>
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+library(knitr)
+knit_print.gt <- function(x, ...) {
+  stringr::str_c(
+    "<div style='all:initial';>\n", 
+    gt::as_raw_html(x), 
+    "\n</div>"
+  ) |> 
+    knitr::asis_output()
+    
+}
+registerS3method(
+  "knit_print", 'gt_tbl', knit_print.gt, 
+  envir = asNamespace("gt") 
+)
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(here)
+library(tidyverse)
+options(dplyr.summarise.inform = FALSE)
+library(ape)
+library(ggtree)
+library(ggmap)
+library(ggspatial)
+library(dendextend)
+library(TransPhylo)
+library(pals)
+library(gt)
+
+## Custom Functions
+source(here("R/utilities.R"))
+source_dir(here("R"))
+```
+
+
+## Transmission Networks
+
+
+## Serotype A   
+Load time-calibrated MCC tree.  
+```{r}
+sero_A.tree <- read.nexus(here("local/beast/a_1/As.mcc.tre"))
+
+plot(sero_A.tree)
+axisPhylo(backward = F)
+```
+  
+Read Beast log file for the tree
+```{r}
+get_A_stats <- get_tracer_stats(here("local/beast/a_1/As_rev.log"))
+
+root_age <- get_A_stats %>%
+    filter(Parameter == "age.root.") %>%
+    select(Median) %>%
+    pull()
+  
+tree_mrsd <- get_A_stats %>%
+    filter(Parameter == "treeModel.rootHeight") %>%
+    select(Median) %>%
+    pull() + root_age
+
+sero_A.tree.p <- ptreeFromPhylo(sero_A.tree,
+                                dateLastSample = tree_mrsd)
+```
+   
+Choose prior  
+Constructing a gamma distribution that reflects FMDV generation time, ballpark 5-15 days, with 7-10 days being more likely.  
+```{r}
+gam_params <- get_gamma_params(7, c(5, 15))
+
+w.shape <- gam_params$shape
+w.scale <- gam_params$scale
+
+set.seed(1976)
+check_gamma <- rgamma(1000, w.shape,   )
+```
+```{r fig.height=6, fig.width=6, warning=FALSE}
+plot_density(check_gamma, max_x = 20)
+```
+
+The `dateT` parameter is the date when observation stopped.  Used 2017 due that being the most recent sample across the A, Asia1, and O serotypes in the study.  
+```{r}
+tt_sero_A <- inferTTree(sero_A.tree.p,
+                        mcmcIterations=10000,
+                        w.shape=w.shape,
+                        w.scale=w.scale,
+                        dateT=2017)
+
+library(coda)
+tt_sero_A.mcmc <- convertToCoda(tt_sero_A)
+effectiveSize(tt_sero_A.mcmc)
+
+#saveRDS(tt_sero_A, here("local/assets/tt_sero_A.rds"))
+```
+
+```{r}
+med=medTTree(tt_sero_A)
+plot(med)
+
+ttree=extractTTree(med)
+plot(ttree,type='detailed',w.shape,w.scale)
+```
+
+Individuals
+```{r}
+tim=getInfectionTimeDist(tt_sero_A, k = "A/PAK/ICT/008-3/2012_pro", show.plot = T)
+off=getOffspringDist(tt_sero_A, k =  "A/PAK/ICT/008-3/2012_pro",show.plot = T)
+
+
+a=getIncidentCases(tt_sero_A,show.plot = T)
+a=getGenerationTimeDist(tt_sero_A,show.plot = T)
+a=getSamplingTimeDist(tt_sero_A,show.plot = T)
+
+a=getInfectionTimeDist(res,k=c('NJ0714COE20','NJ0515TXE'),show.plot = T)
+a=getOffspringDist(res,k=c('NJ0714COE20','NJ0515TXE'),show.plot = T)
+
+```
+
+```{r}
+A_tnetwork <- extract_transmission_network(tt_sero_A)
+
+# ID data from preprocessing
+sero_df <- readRDS(here("local/assets/sero_df.rds"))
+
+animal_codes <- sero_df %>%
+  mutate(host_id = label) %>%
+  select(host_id, animal, farm_code, status, serotype)
+
+A_tnetwork <-left_join(A_tnetwork, animal_codes, by = "host_id")
+
+A_tnetwork$status[is.na(A_tnetwork$status)] = "Unknown"
+
+
+
+
+
+
+```
+
+```{r}
+library(ggraph)
+library(igraph)
+
+A_tnetwork <- A_tnetwork %>% filter(!is.na(infector))
+
+edges <- data.frame(from = A_tnetwork$infector, to = A_tnetwork$host_id)
+
+g <- graph_from_data_frame(edges, directed = TRUE)
+
+V(g)$status <- "Unknown"
+
+V(g)$status[V(g)$name %in% A_tnetwork$host_id] <- A_tnetwork$status[match(V(g)$name[V(g)$name %in% A_tnetwork$host_id], A_tnetwork$host_id)]
+
+
+p <- ggraph(g, layout = 'fr') + 
+  geom_edge_link(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
+                 color = 'gray20', alpha=0.9, 
+                 arrow = arrow(type = "closed", length = unit(2, "mm"))) +
+  geom_node_point(aes(color = status), size = 5, alpha = 0.6) +
+  scale_color_manual(values = c("Subclinical" = "orange", "Clinical" = "steelblue", "Unknown" = "gray50")) +
+  #geom_node_label(aes(label = name), repel = TRUE) +
+  theme_void() +
+  labs(title = "Network Graph",
+       subtitle = "Nodes: host_id, Edges: infector to host_id")
+
+print(p)
+
+
+
+
+
+
+
+
+
+
+
+```
+

@@ -89,6 +89,11 @@ tree_files <- list.files(here("local/paktrees"), pattern="_rev\\.nex$")
 
 # choose a tree
 tree_tmp <- read.nexus(here("local/paktrees", tree_files[4]))
+```
+```{r fig.height=18, fig.width=8}
+#| label: fig-treeview
+#| fig-cap: "Figure is only a test plot to verify labels were correctly swapped in the Nexus file, but represents Segment 3D."
+#|  
 
 plot_tree_serotype(tree_tmp)
 ```
@@ -195,29 +200,33 @@ sub_only <- sero_df %>%
 
 sub_only$serotype <- sub("/.*", "", sub_only$label)
 ```
+   
+save a copy
+```{r eval=FALSE}
+saveRDS(sero_df, here("local/assets/sero_df.rds"))
+```
   
 ### Co-Infected Animals  
 The below table lists samples with sequentially, or concurrent co-infection 
 ```{r}
 coinf_set <- sub_only %>%
   group_by(animal) %>%
-  summarise(Uniq = length(unique(serotype))) %>%
-  filter(Uniq > 1) %>%
-  ungroup()
-
-sub_only %>%
-  filter(animal %in% coinf_set$animal) %>%
-  select(-string) %>%
+  summarise(Infections = length(serotype)) %>%
+  filter(Infections > 1) %>%
+  ungroup() %>%
   arrange(animal) %>%
+  mutate(Item = row_number()) %>%
+  select(Item, animal, Infections)
+```
+
+```{r}
+coinf_set %>%
   gt() %>%
   tab_header(
-    title = md("Subclinical Co-Infected Animals")) %>%
-  cols_width(starts_with("label") ~ px(250),
-             starts_with("animal") ~ px(90),
-             starts_with("sample") ~ px(90),
-             starts_with("farm_code") ~ px(100),
-             starts_with("samp_date") ~ px(100),
-             everything() ~ px(80)) %>%
+    title = md("Sampled FMDV by Animal")) %>%
+  cols_width(starts_with("animal") ~ px(100),
+             starts_with("Infections") ~ px(90),
+             everything() ~ px(95)) %>%
   tab_options(table.font.size = "small",
               row_group.font.size = "small",
               stub.font.size = "small",
@@ -226,7 +235,32 @@ sub_only %>%
               data_row.padding = px(2),
               heading.title.font.weight = "bold",
               column_labels.font.weight = "bold") %>%
-  opt_stylize(style = 6, color = 'gray')
+  opt_stylize(style = 6, color = 'gray')  %>%
+  tab_caption(caption = md("Table lists subclinical animals sampled to have multiple infections.  May be sequential or coinfections, and may be from the same or different FMDVs. The Infections columns lits the number sampled.  Detailed records for these animals are in the next table."))
+
+sub_only %>%
+  filter(animal %in% coinf_set$animal) %>%
+  select(-string) %>%
+  arrange(animal) %>%
+  gt() %>%
+  tab_header(
+    title = md("Subclinical with Multiple Infections")) %>%
+  cols_width(starts_with("label") ~ px(250),
+             starts_with("animal") ~ px(90),
+             starts_with("sample") ~ px(90),
+             starts_with("farm_code") ~ px(100),
+             starts_with("samp_date") ~ px(100),
+             everything() ~ px(95)) %>%
+  tab_options(table.font.size = "small",
+              row_group.font.size = "small",
+              stub.font.size = "small",
+              column_labels.font.size = "medium",
+              heading.title.font.size = "large",
+              data_row.padding = px(2),
+              heading.title.font.weight = "bold",
+              column_labels.font.weight = "bold") %>%
+  opt_stylize(style = 6, color = 'gray') %>%
+  tab_caption(caption = md("Table lists indiviual records for animals sampled to have multiple infections.  Detailed version of previous table showing counts."))
 ```
 
 
@@ -250,6 +284,9 @@ background <- sero_df_red %>%
 palette_colors <- pals::watlington(length(unique(sero_df_red$farm_code)))
 ```
 ```{r fig.width=9, fig.height=10, collapse=TRUE}
+#| label: fig-coinfect
+#| fig-cap: "Figure summarizes the serotypes and timiming of FMDV sampled from animals listed along vertical axis.  More than one point on a line indicates multiple infections were detected."
+#|  
 ggplot() +
   geom_rect(data = background, aes(xmin = as.Date("2011-11-30"), 
                                    xmax = as.Date("2012-12-31"), 
