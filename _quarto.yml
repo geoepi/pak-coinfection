@@ -12,6 +12,8 @@ website:
         text: Entanglement
       - href: time_tree.qmd
         text: Phylogeny 
+      - href: networks.qmd
+        text: Networks 
     right:
       - href: https://geoepi.github.io/
         text: GeoEpi

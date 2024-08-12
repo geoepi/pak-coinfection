@@ -117,5 +117,54 @@
     "title": "Time Calibrated Phylogenies",
     "section": "Serotype O",
     "text": "Serotype O\n\n\nHide code\ncheck_stats <- get_tracer_stats(here(\"local/beast/o_1/sero_0.log\"))\n\nkeep_stats <- c(\"joint\", \"prior\", \"likelihood\", \"treeModel.rootHeight\", \"age.root.\",\n                \"treeLength\", \"tmrca.fmd_a_rev.\", \"clock.rate\")\n\ncheck_stats %>%\n  filter(Parameter %in% keep_stats) %>%\n  gt() %>%\n  tab_header(\n    title = md(\"Serotype O Stats\")) %>%\n  cols_width(starts_with(\"Parameter\") ~ px(200),\n             starts_with(\"label\") ~ px(60),\n             everything() ~ px(95)) %>%\n  tab_options(table.font.size = \"small\",\n              row_group.font.size = \"small\",\n              stub.font.size = \"small\",\n              column_labels.font.size = \"medium\",\n              heading.title.font.size = \"large\",\n              data_row.padding = px(2),\n              heading.title.font.weight = \"bold\",\n              column_labels.font.weight = \"bold\") %>%\n  opt_stylize(style = 6, color = 'gray')\n\n\n\n\n\n  \n  \n  \n    \n    \n    \n    \n    \n    \n  \n  \n    \n      Serotype O Stats\n\n    \n    \n    \n      Parameter\n      Mean\n      Median\n      Q_0.025\n      Q_0.975\n      ESS\n    \n  \n  \n    joint\n-5209.488\n-5208.762\n-5226.241\n-5197.209\n3568\n    prior\n-75.522\n-74.950\n-89.019\n-65.512\n2568\n    likelihood\n-5133.966\n-5133.702\n-5145.086\n-5124.659\n8002\n    treeModel.rootHeight\n15.158\n14.650\n11.776\n21.363\n2294\n    age.root.\n2000.962\n2001.470\n1994.757\n2004.345\n2294\n    treeLength\n51.497\n49.341\n38.452\n77.114\n2042\n    clock.rate\n0.004\n0.004\n0.003\n0.005\n2758\n  \n  \n  \n\n\n\n\n\nLoad MCC tree\n\n\nHide code\nsero_O.tree <- read.nexus(here(\"local/beast/o_1/Os.mcc.tre\"))\n\nplot_time_tree(sero_O.tree, check_stats, legend_pos = c(0.2, 0.5))\n\n\n\n\n\nFMDV Effective Population Size\nFlat Ne, like the other serotypes\n\n\nHide code\nphylodynamic_process(sero_O.tree, check_stats, x_limits = c(\"2011-01-01\", \"2013-01-01\"))"
+  },
+  {
+    "objectID": "networks.html#transmission-networks",
+    "href": "networks.html#transmission-networks",
+    "title": "Networks",
+    "section": "Transmission Networks",
+    "text": "Transmission Networks"
+  },
+  {
+    "objectID": "networks.html#serotype-a",
+    "href": "networks.html#serotype-a",
+    "title": "Networks",
+    "section": "Serotype A",
+    "text": "Serotype A\nLoad time-calibrated MCC tree.\n\n\nHide code\nsero_A.tree <- read.nexus(here(\"local/beast/a_1/As.mcc.tre\"))\n\n\nRead Beast log file for the tree\n\n\nHide code\nget_A_stats <- get_tracer_stats(here(\"local/beast/a_1/As_rev.log\"))\n\n\nLoading required package: coda\n\n\nHide code\nroot_age <- get_A_stats %>%\n    filter(Parameter == \"age.root.\") %>%\n    select(Median) %>%\n    pull()\n  \ntree_mrsd <- get_A_stats %>%\n    filter(Parameter == \"treeModel.rootHeight\") %>%\n    select(Median) %>%\n    pull() + root_age\n\nsero_A.tree.p <- ptreeFromPhylo(sero_A.tree,\n                                dateLastSample = tree_mrsd)\n\n\nChoose prior\nConstructing a gamma distribution that reflects FMDV generation time, ballpark 5-15 days, with 7-10 days being more likely.\n\n\nHide code\ngam_params <- get_gamma_params(7, c(5, 15))\n\nw.shape <- gam_params$shape\nw.scale <- gam_params$scale\n\nset.seed(1976)\ncheck_gamma <- rgamma(1000, w.shape,   )\n\n\n\n\nHide code\nplot_density(check_gamma, max_x = 20)\n\n\n\n\n\nThe dateT parameter is the date when observation stopped. Used 2017.5 due that being the most recent sample across the A, Asia1, and O serotypes in the study.\n\n\nHide code\ntt_sero_A <- inferTTree(sero_A.tree.p,\n                        mcmcIterations=10000,\n                        w.shape=w.shape,\n                        w.scale=w.scale,\n                        dateT=2017.5)\n\nsaveRDS(tt_sero_A, here(\"local/assets/tt_sero_A.rds\"))"
+  },
+  {
+    "objectID": "networks.html#serotype-asia1",
+    "href": "networks.html#serotype-asia1",
+    "title": "Networks",
+    "section": "Serotype Asia1",
+    "text": "Serotype Asia1\n\n\nHide code\nsero_Asia1.tree <- read.nexus(here(\"local/beast/asia1_1/asia1.mcc.tre\"))\nAsia1_stats <- get_tracer_stats(here(\"local/beast/asia1_1/Asia1s.log\"))\n\n\n\n\nHide code\ntt_sero_Asia1 <- infer_ttree(sero_Asia1.tree,\n                             Asia1_stats,\n                             w.shape=w.shape,\n                             w.scale=w.scale,\n                             dateT = 2017.5)\n\nsaveRDS(tt_sero_Asia1, here(\"local/assets/tt_sero_Asia1.rds\"))"
+  },
+  {
+    "objectID": "networks.html#serotype-o",
+    "href": "networks.html#serotype-o",
+    "title": "Networks",
+    "section": "Serotype O",
+    "text": "Serotype O\n\n\nHide code\nsero_O.tree <- read.nexus(here(\"local/beast/o_1/Os.mcc.tre\"))\nO_stats <- get_tracer_stats(here(\"local/beast/o_1/sero_0.log\"))\n\n\n\n\nHide code\ntt_sero_O <- infer_ttree(sero_O.tree,\n                         O_stats,\n                         w.shape=w.shape,\n                         w.scale=w.scale,\n                         dateT = 2017.5)\n\nsaveRDS(tt_sero_O, here(\"local/assets/tt_sero_O.rds\"))"
+  },
+  {
+    "objectID": "networks.html#get-networks",
+    "href": "networks.html#get-networks",
+    "title": "Networks",
+    "section": "Get Networks",
+    "text": "Get Networks\n\n\n\n\n\nHide code\nA_net <- extract_transmission_network(tt_sero_A) %>%\n  mutate(Serotype = \"A\")\n\nAsia1_net <- extract_transmission_network(tt_sero_Asia1) %>%\n  mutate(Serotype = \"Asia1\")\n\nO_net <- extract_transmission_network(tt_sero_O) %>%\n  mutate(Serotype = \"O\")\n\nall_networks <- rbind(A_net, Asia1_net, O_net)"
+  },
+  {
+    "objectID": "networks.html#match-metadata",
+    "href": "networks.html#match-metadata",
+    "title": "Networks",
+    "section": "Match Metadata",
+    "text": "Match Metadata\n\n\nHide code\nsero_df <- readRDS(here(\"local/assets/sero_df.rds\")) # from preprocessing\n\nanimal_codes <- sero_df %>%\n  filter(status == \"Subclinical\") %>%\n  mutate(host_id = label) %>%\n  select(host_id, animal, farm_code, status)\n\nall_networks <-left_join(all_networks, animal_codes, by = \"host_id\") %>%\n  mutate(animal = as.character(animal),\n         status = if_else(is.na(status), \"Clinical\", status),\n         infected_ani = if_else(status == \"Subclinical\", animal, host_id))\n\nall_networks$infector_match <- with(animal_codes,\n                                    animal[match(\n                                      all_networks$infector,\n                                      host_id)])\n\nall_networks <- all_networks %>%\n  mutate(infector_match = as.character(infector_match),\n         infector_ani = if_else(is.na(infector_match), infector, infector_match),\n         infection_date = as.Date(infection_date))"
+  },
+  {
+    "objectID": "networks.html#set-vertices-and-nodes",
+    "href": "networks.html#set-vertices-and-nodes",
+    "title": "Networks",
+    "section": "Set Vertices and Nodes",
+    "text": "Set Vertices and Nodes\n\n\nHide code\nedges <- data.frame(from = all_networks$infector_ani, to = all_networks$infected_ani)\n\ng <- graph_from_data_frame(edges, directed = TRUE)\n\nV(g)$status <- \"Unknown\"\n\nV(g)$status[V(g)$name %in% all_networks$infected_ani] <- all_networks$status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]\n\nV(g)$Serotype <- \"Origin\"\nV(g)$Serotype[V(g)$name %in% all_networks$infected_ani] <- \n  all_networks$Serotype[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]\n\nV(g)$infection_date <- NA\nV(g)$infection_date[V(g)$name %in% all_networks$infected_ani] <- \n  all_networks$infection_date[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]\n\nV(g)$infection_date <- as.Date(V(g)$infection_date)\n\n\nFirst attempt\n\n\nHide code\np <- ggraph(g, layout = 'tree') + \n  geom_edge_diagonal(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),\n                 color = 'gray20', alpha=0.9, \n                 arrow = arrow(type = \"closed\", length = unit(2, \"mm\"))) +\n  geom_node_point(aes(color = status, shape = Serotype), size = 4, alpha = 0.6) +\n  scale_color_manual(values = c(\"Subclinical\" = \"orange\", \"Clinical\" = \"steelblue\", \"Unknown\" = \"gray50\")) +\n  #geom_node_label(aes(label = name), repel = TRUE) +\n  theme_void() +\n  labs(title = \"Network Graph\",\n       subtitle = \"Nodes: host_id, Edges: infector to host_id\")\n\np\n\n\n\n\n\n\nTo be continued…"
   }
 ]

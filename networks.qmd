@@ -56,6 +56,8 @@ library(tidyverse)
 options(dplyr.summarise.inform = FALSE)
 library(ape)
 library(ggtree)
+library(ggraph)
+library(igraph)
 library(ggmap)
 library(ggspatial)
 library(dendextend)
@@ -76,9 +78,6 @@ source_dir(here("R"))
 Load time-calibrated MCC tree.  
 ```{r}
 sero_A.tree <- read.nexus(here("local/beast/a_1/As.mcc.tre"))
-
-plot(sero_A.tree)
-axisPhylo(backward = F)
 ```
   
 Read Beast log file for the tree
@@ -114,102 +113,270 @@ check_gamma <- rgamma(1000, w.shape,   )
 plot_density(check_gamma, max_x = 20)
 ```
 
-The `dateT` parameter is the date when observation stopped.  Used 2017 due that being the most recent sample across the A, Asia1, and O serotypes in the study.  
-```{r}
+The `dateT` parameter is the date when observation stopped.  Used 2017.5 due that being the most recent sample across the A, Asia1, and O serotypes in the study.  
+```{r eval=FALSE}
 tt_sero_A <- inferTTree(sero_A.tree.p,
                         mcmcIterations=10000,
                         w.shape=w.shape,
                         w.scale=w.scale,
-                        dateT=2017)
+                        dateT=2017.5)
 
-library(coda)
-tt_sero_A.mcmc <- convertToCoda(tt_sero_A)
-effectiveSize(tt_sero_A.mcmc)
-
-#saveRDS(tt_sero_A, here("local/assets/tt_sero_A.rds"))
+saveRDS(tt_sero_A, here("local/assets/tt_sero_A.rds"))
 ```
 
+## Serotype Asia1
 ```{r}
-med=medTTree(tt_sero_A)
-plot(med)
-
-ttree=extractTTree(med)
-plot(ttree,type='detailed',w.shape,w.scale)
+sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/asia1.mcc.tre"))
+Asia1_stats <- get_tracer_stats(here("local/beast/asia1_1/Asia1s.log"))
 ```
+```{r eval=FALSE}
+tt_sero_Asia1 <- infer_ttree(sero_Asia1.tree,
+                             Asia1_stats,
+                             w.shape=w.shape,
+                             w.scale=w.scale,
+                             dateT = 2017.5)
 
-Individuals
-```{r}
-tim=getInfectionTimeDist(tt_sero_A, k = "A/PAK/ICT/008-3/2012_pro", show.plot = T)
-off=getOffspringDist(tt_sero_A, k =  "A/PAK/ICT/008-3/2012_pro",show.plot = T)
-
-
-a=getIncidentCases(tt_sero_A,show.plot = T)
-a=getGenerationTimeDist(tt_sero_A,show.plot = T)
-a=getSamplingTimeDist(tt_sero_A,show.plot = T)
-
-a=getInfectionTimeDist(res,k=c('NJ0714COE20','NJ0515TXE'),show.plot = T)
-a=getOffspringDist(res,k=c('NJ0714COE20','NJ0515TXE'),show.plot = T)
-
+saveRDS(tt_sero_Asia1, here("local/assets/tt_sero_Asia1.rds"))
 ```
-
+  
+## Serotype O
 ```{r}
-A_tnetwork <- extract_transmission_network(tt_sero_A)
+sero_O.tree <- read.nexus(here("local/beast/o_1/Os.mcc.tre"))
+O_stats <- get_tracer_stats(here("local/beast/o_1/sero_0.log"))
+```
+```{r eval=FALSE}
+tt_sero_O <- infer_ttree(sero_O.tree,
+                         O_stats,
+                         w.shape=w.shape,
+                         w.scale=w.scale,
+                         dateT = 2017.5)
 
-# ID data from preprocessing
-sero_df <- readRDS(here("local/assets/sero_df.rds"))
+saveRDS(tt_sero_O, here("local/assets/tt_sero_O.rds"))
+```  
+   
+## Get Networks 
+
+```{r echo=FALSE}
+tt_sero_A <- readRDS(here("local/assets/tt_sero_A.rds"))
+tt_sero_Asia1 <- readRDS(here("local/assets/tt_sero_Asia1.rds"))
+tt_sero_O <- readRDS(here("local/assets/tt_sero_O.rds"))
+```
+```{r}
+A_net <- extract_transmission_network(tt_sero_A) %>%
+  mutate(Serotype = "A")
+
+Asia1_net <- extract_transmission_network(tt_sero_Asia1) %>%
+  mutate(Serotype = "Asia1")
+
+O_net <- extract_transmission_network(tt_sero_O) %>%
+  mutate(Serotype = "O")
+
+all_networks <- rbind(A_net, Asia1_net, O_net)
+```
+  
+## Match Metadata
+```{r}
+sero_df <- readRDS(here("local/assets/sero_df.rds")) # from preprocessing
 
 animal_codes <- sero_df %>%
+  filter(status == "Subclinical") %>%
   mutate(host_id = label) %>%
-  select(host_id, animal, farm_code, status, serotype)
+  select(host_id, animal, farm_code, status)
 
-A_tnetwork <-left_join(A_tnetwork, animal_codes, by = "host_id")
+all_networks <-left_join(all_networks, animal_codes, by = "host_id") %>%
+  mutate(animal = as.character(animal),
+         status = if_else(is.na(status), "Clinical", status),
+         infected_ani = if_else(status == "Subclinical", animal, host_id))
 
-A_tnetwork$status[is.na(A_tnetwork$status)] = "Unknown"
+all_networks$infector_match <- with(animal_codes,
+                                    animal[match(
+                                      all_networks$infector,
+                                      host_id)])
 
-
-
-
-
-
+all_networks <- all_networks %>%
+  mutate(infector_match = as.character(infector_match),
+         infector_ani = if_else(is.na(infector_match), infector, infector_match),
+         infection_date = as.Date(infection_date))
 ```
 
+## Set Vertices and Nodes
 ```{r}
-library(ggraph)
-library(igraph)
-
-A_tnetwork <- A_tnetwork %>% filter(!is.na(infector))
-
-edges <- data.frame(from = A_tnetwork$infector, to = A_tnetwork$host_id)
+edges <- data.frame(from = all_networks$infector_ani, to = all_networks$infected_ani)
 
 g <- graph_from_data_frame(edges, directed = TRUE)
 
 V(g)$status <- "Unknown"
 
-V(g)$status[V(g)$name %in% A_tnetwork$host_id] <- A_tnetwork$status[match(V(g)$name[V(g)$name %in% A_tnetwork$host_id], A_tnetwork$host_id)]
+V(g)$status[V(g)$name %in% all_networks$infected_ani] <- all_networks$status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
 
+V(g)$Serotype <- "Origin"
+V(g)$Serotype[V(g)$name %in% all_networks$infected_ani] <- 
+  all_networks$Serotype[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
 
-p <- ggraph(g, layout = 'fr') + 
-  geom_edge_link(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
+V(g)$infection_date <- NA
+V(g)$infection_date[V(g)$name %in% all_networks$infected_ani] <- 
+  all_networks$infection_date[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+
+V(g)$infection_date <- as.Date(V(g)$infection_date)
+```
+  
+First attempt  
+```{r fig.width=10, fig.height=10}
+
+p <- ggraph(g, layout = 'tree') + 
+  geom_edge_diagonal(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
                  color = 'gray20', alpha=0.9, 
                  arrow = arrow(type = "closed", length = unit(2, "mm"))) +
-  geom_node_point(aes(color = status), size = 5, alpha = 0.6) +
+  geom_node_point(aes(color = status, shape = Serotype), size = 4, alpha = 0.6) +
   scale_color_manual(values = c("Subclinical" = "orange", "Clinical" = "steelblue", "Unknown" = "gray50")) +
   #geom_node_label(aes(label = name), repel = TRUE) +
   theme_void() +
   labs(title = "Network Graph",
        subtitle = "Nodes: host_id, Edges: infector to host_id")
 
-print(p)
-
-
-
-
-
-
-
-
-
-
-
+p
 ```
 
+   
+#### To be continued...   
+
+```{r eval=FALSE, echo=FALSE}
+library(gganimate)
+
+
+edges <- data.frame(from = all_networks$infector_ani, to = all_networks$infected_ani)
+
+g <- graph_from_data_frame(edges, directed = TRUE)
+
+V(g)$status <- "Unknown"
+V(g)$status[V(g)$name %in% all_networks$infected_ani] <- 
+  all_networks$status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+
+V(g)$Serotype <- NA
+V(g)$Serotype[V(g)$name %in% all_networks$infected_ani] <- 
+  all_networks$Serotype[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+
+V(g)$infection_date <- NA
+V(g)$infection_date[V(g)$name %in% all_networks$infected_ani] <- 
+  as.Date(all_networks$infection_date[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)])
+
+nodes_df <- data.frame(name = V(g)$name, status = V(g)$status, Serotype = V(g)$Serotype, 
+                       infection_date = as.Date(V(g)$infection_date))
+
+nodes_df$infection_date[is.na(nodes_df$infection_date)] <- min(nodes_df$infection_date, na.rm = TRUE) - 1
+
+p <- ggraph(g, layout = 'tree') + 
+  geom_edge_link(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
+                 color = 'gray20', alpha=0.9, 
+                 arrow = arrow(type = "closed", length = unit(2, "mm"))) +
+  geom_node_point(aes(color = status, shape = Serotype), size = 5, alpha = 0.6) +
+  scale_color_manual(values = c("Subclinical" = "orange", 
+                                "Clinical" = "steelblue", 
+                                "Unknown" = "gray50")) +
+  theme_void() +
+  labs(title = "Network Graph",
+       subtitle = "Nodes: host_id, Edges: infector to host_id") +
+  transition_time(nodes_df$infection_date) +
+  labs(subtitle = 'Date: {frame_time}') +
+    shadow_mark(alpha = alpha / 2, color = "gray40")
+
+anim <- animate(p, width = 800, height = 600, 
+                fps = 10, end_pause = 50, 
+                renderer = gifski_renderer())
+
+#anim_save("network_animation.gif", anim)
+anim
+
+```
+```{r eval=FALSE, echo=FALSE}
+nodes_df <- data.frame(name = V(g)$name, 
+                       status = V(g)$status, 
+                       Serotype = V(g)$Serotype, 
+                       infection_date = V(g)$infection_date)
+
+dummy_date <- min(nodes_df$infection_date, na.rm = TRUE) - 1
+nodes_df$infection_date[is.na(nodes_df$infection_date)] <- dummy_date
+
+expanded_dates <- seq(dummy_date, max(nodes_df$infection_date), by="day")
+animation_data <- expand.grid(name = nodes_df$name, frame_time = expanded_dates) %>%
+  left_join(nodes_df, by = "name") %>%
+  mutate(visible = if_else(frame_time >= infection_date, 1, 0))
+
+p <- ggraph(g, layout = 'tree') + 
+  geom_edge_link(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
+                 color = 'gray20', alpha=0.9, 
+                 arrow = arrow(type = "closed", length = unit(2, "mm"))) +
+  geom_node_point(aes(color = status, shape = Serotype, alpha = visible), size = 5) +
+  scale_color_manual(values = c("Subclinical" = "orange", "Clinical" = "steelblue", "Unknown" = "gray50")) +
+  scale_alpha(range = c(0.1, 1)) +  
+  theme_void() +
+  labs(title = "Network Graph",
+       subtitle = 'Date: {frame_time}') +
+  transition_time(frame_time) +
+  shadow_mark(alpha = 0.3, size = 3) 
+
+fps_value <- 5 
+animation_duration <- 20 #
+pause_frames <- 50 
+
+anim <- animate(p, width = 800, height = 600, fps = fps_value, duration = animation_duration, end_pause = pause_frames, renderer = gifski_renderer())
+```
+
+```{r eval=FALSE, echo=FALSE}
+library(igraph)
+library(ggraph)
+library(ggplot2)
+library(gganimate)
+library(dplyr)
+edges <- data.frame(from = all_networks$infector_ani, to = all_networks$infected_ani)
+
+g <- graph_from_data_frame(edges, directed = TRUE)
+
+V(g)$status <- "Unknown"
+
+V(g)$status[V(g)$name %in% all_networks$infected_ani] <- all_networks$status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+
+V(g)$Serotype <- NA
+V(g)$Serotype[V(g)$name %in% all_networks$infected_ani] <- 
+  all_networks$Serotype[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+
+V(g)$infection_date <- NA
+V(g)$infection_date[V(g)$name %in% all_networks$infected_ani] <- 
+  all_networks$infection_date[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+
+V(g)$infection_date <- as.Date(V(g)$infection_date)
+
+nodes_df <- data.frame(name = V(g)$name, 
+                       status = V(g)$status, 
+                       Serotype = V(g)$Serotype, 
+                       infection_date = V(g)$infection_date)
+
+earliest_date <- min(nodes_df$infection_date, na.rm = TRUE)
+dummy_date <- earliest_date - 1
+nodes_df$infection_date[is.na(nodes_df$infection_date)] <- dummy_date
+
+expanded_dates <- seq(dummy_date, max(nodes_df$infection_date), by = "day")
+animation_data <- expand.grid(name = nodes_df$name, frame_time = expanded_dates) %>%
+  left_join(nodes_df, by = "name") %>%
+  mutate(visible = if_else(frame_time >= infection_date, 1, 0))
+
+p <- ggraph(g, layout = 'tree') + 
+  geom_edge_link(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
+                 color = 'gray20', alpha=0.9, 
+                 arrow = arrow(type = "closed", length = unit(2, "mm"))) +
+  geom_node_point(aes(color = status, shape = Serotype, filter = visible == 1), size = 5) +
+  scale_color_manual(values = c("Subclinical" = "orange", "Clinical" = "steelblue", "Unknown" = "gray50")) +
+  theme_void() +
+  labs(title = "Network Graph",
+       subtitle = 'Date: {frame_time}') +
+  transition_time(frame_time) +
+  shadow_mark(alpha = 0.3, size = 3) 
+
+
+fps_value <- 5 
+animation_duration <- 20 
+pause_frames <- 50 
+
+anim <- animate(p, width = 800, height = 600, fps = fps_value, duration = animation_duration, end_pause = pause_frames, renderer = gifski_renderer())
+anim_save("network_animation_with_shadow.gif", anim)
+```
