@@ -1,5 +1,7 @@
 plot_time_tree <- function(tree, stats, legend_pos = c(0.3, 0.7)) {
   
+  options(ignore.negative.edge=TRUE)
+  
   root_age <- stats %>%
     filter(Parameter == "age.root.") %>%
     select(Median) %>%

@@ -101,14 +101,17 @@ plot_tree_serotype(tree_tmp)
 ## Geography  
 Extract, clean, and join geographic coordinates.  The function *convert_dms_to_dd()* was coded to clean special characters and mistyped text from the raw file before conversion.  
 ```{r fig.width=8, fig.height=8, warning=FALSE, message=FALSE}
-farm_file <- read.csv(here("local/farm_clean.csv"))
+farm_file <- read.csv(here("local/farm_clean2.csv"))
 
 farm_file  <- farm_file %>%
   mutate(coord_x = as.numeric(sapply(coord_x, convert_dms_to_dd)),
          coord_y = as.numeric(sapply(coord_y, convert_dms_to_dd)))
 
 farms_locs <- farm_file %>%
-  filter(farm_code != "")
+  group_by(farm_code) %>%
+  slice(1) %>%
+  ungroup() %>%
+  as.data.frame()
 ```
   
 ### Format data for mapping  
@@ -165,9 +168,9 @@ sero_df <- sero_df  %>%
   select(-parts)
 
 # fix mixed date formats
-farm_file <- farm_file  %>%
- mutate(across(starts_with("samp_date_"), ~as.Date(convert_dates(.))))
-
+farm_file <- farm_file %>%
+    mutate(across(starts_with("samp_date_"), ~ format(dmy(.), "%Y-%m-%d")))
+ 
 # table by sample and animal
 samp_date_table <- farm_file %>%
   select(animal, samp_date_1, samp_date_2, samp_date_3, samp_date_4) %>%
@@ -180,6 +183,7 @@ samp_date_table <- farm_file %>%
   select(-sample_txt)
 
 sero_df <- left_join(sero_df, samp_date_table, by = c("animal", "sample"))
+sero_df$samp_date <- as.Date(sero_df$samp_date)
 
 farm_file$farm_code <- with(farms_locs,
                             farm_code[match(
@@ -368,7 +372,7 @@ dates_file <- left_join(tree_tips, dates_file, by="label")
 
 dates_file <- dates_file %>%
   mutate(samp_date = case_when(
-    label == "KF112900" ~ as_date("2009-06-01", format = "%Y-%m-%d"),
+    label == "KF112900" ~ as_date("2009-01-14", format = "%Y-%m-%d"),
     label == "JF721440" ~ as_date("2009-06-01", format = "%Y-%m-%d"),
     label == "MT981310" ~ as_date("2012-06-01", format = "%Y-%m-%d"),
     
@@ -383,7 +387,7 @@ dates_file <- dates_file %>%
     TRUE ~ samp_date 
   ))
 
-write.table(dates_file, file = here("local/fmd_a_dates.tsv"), 
+write.table(dates_file, file = here("local/beast/a_1/fmd_a_dates.tsv"), 
             sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
 
 ```

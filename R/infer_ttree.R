@@ -10,6 +10,10 @@ infer_ttree <- function(tree, stats, mcmcIterations=10000, w.shape, w.scale, dat
     select(Median) %>%
     pull() + root_age
   
+  if(min(tree$edge.length) < 0.0001){
+    tree$edge.length <- pmax(tree$edge.length,1/365)
+  }
+  
   tree_p <- ptreeFromPhylo(tree, dateLastSample = tree_mrsd)
   
   tt_out <- inferTTree(tree_p,

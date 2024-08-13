@@ -72,7 +72,7 @@ source_dir(here("R"))
 ## Serotype A   
 Check tree model statistics the *get_tracer_stats()* function calculates similar summary statistics as the Tracer software typically used with BEAST.  
 ```{r message=FALSE, warning=FALSE}
-check_stats <- get_tracer_stats(here("local/beast/a_1/As_rev.log"))
+check_stats <- get_tracer_stats(here("local/beast/a_1/sero_a.log.txt"))
 
 keep_stats <- c("joint", "prior", "likelihood", "treeModel.rootHeight", "age.root.",
                 "treeLength", "tmrca.fmd_a_rev.", "clock.rate")
@@ -98,7 +98,7 @@ check_stats %>%
 
 Load MCC tree
 ```{r fig.width=10, fig.height=18}
-sero_A.tree <- read.nexus(here("local/beast/a_1/As.mcc.tre"))
+sero_A.tree <- read.nexus(here("local/beast/a_1/sero_a.mcc.tre"))
 
 plot_time_tree(sero_A.tree, check_stats)
 
@@ -113,7 +113,7 @@ phylodynamic_process(sero_A.tree, check_stats, x_limits = c("2011-01-01", "2013-
 
 ## Serotype Asia1   
 ```{r}
-check_stats <- get_tracer_stats(here("local/beast/asia1_1/Asia1s.log"))
+check_stats <- get_tracer_stats(here("local/beast/asia1_1/sero_asia1.log.txt"))
 
 keep_stats <- c("joint", "prior", "likelihood", "treeModel.rootHeight", "age.root.",
                 "treeLength", "tmrca.fmd_a_rev.", "clock.rate")
@@ -139,7 +139,7 @@ check_stats %>%
 
 Load MCC tree
 ```{r fig.width=10, fig.height=18}
-sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/asia1.mcc.tre")) 
+sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/sero_asia1.mcc.tre")) 
 plot_time_tree(sero_Asia1.tree, check_stats, legend_pos = c(0.2, 0.5))
 
 ```
@@ -152,7 +152,7 @@ phylodynamic_process(sero_Asia1.tree, check_stats, x_limits = c("2011-01-01", "2
 
 ## Serotype O   
 ```{r}
-check_stats <- get_tracer_stats(here("local/beast/o_1/sero_0.log"))
+check_stats <- get_tracer_stats(here("local/beast/o_1/sero_o.log.txt"))
 
 keep_stats <- c("joint", "prior", "likelihood", "treeModel.rootHeight", "age.root.",
                 "treeLength", "tmrca.fmd_a_rev.", "clock.rate")
@@ -178,7 +178,7 @@ check_stats %>%
 
 Load MCC tree   
 ```{r fig.width=10, fig.height=18}
-sero_O.tree <- read.nexus(here("local/beast/o_1/Os.mcc.tre"))
+sero_O.tree <- read.nexus(here("local/beast/o_1/sero_o.mcc.tre"))
 
 plot_time_tree(sero_O.tree, check_stats, legend_pos = c(0.2, 0.5))
 

@@ -53,12 +53,14 @@ registerS3method(
 ```{r warning=FALSE, message=FALSE, echo=FALSE}
 library(here)
 library(tidyverse)
+library(tidygraph)
 options(dplyr.summarise.inform = FALSE)
 library(ape)
 library(ggtree)
 library(ggraph)
 library(igraph)
 library(ggmap)
+library(gganimate)
 library(ggspatial)
 library(dendextend)
 library(TransPhylo)
@@ -77,12 +79,12 @@ source_dir(here("R"))
 ## Serotype A   
 Load time-calibrated MCC tree.  
 ```{r}
-sero_A.tree <- read.nexus(here("local/beast/a_1/As.mcc.tre"))
+sero_A.tree <- read.nexus(here("local/beast/a_1/sero_a.mcc.tre"))
 ```
   
 Read Beast log file for the tree
 ```{r}
-get_A_stats <- get_tracer_stats(here("local/beast/a_1/As_rev.log"))
+get_A_stats <- get_tracer_stats(here("local/beast/a_1/sero_a.log.txt"))
 
 root_age <- get_A_stats %>%
     filter(Parameter == "age.root.") %>%
@@ -126,8 +128,8 @@ saveRDS(tt_sero_A, here("local/assets/tt_sero_A.rds"))
 
 ## Serotype Asia1
 ```{r}
-sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/asia1.mcc.tre"))
-Asia1_stats <- get_tracer_stats(here("local/beast/asia1_1/Asia1s.log"))
+sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/sero_asia1.mcc.tre"))
+Asia1_stats <- get_tracer_stats(here("local/beast/asia1_1/sero_asia1.log.txt"))
 ```
 ```{r eval=FALSE}
 tt_sero_Asia1 <- infer_ttree(sero_Asia1.tree,
@@ -141,8 +143,8 @@ saveRDS(tt_sero_Asia1, here("local/assets/tt_sero_Asia1.rds"))
   
 ## Serotype O
 ```{r}
-sero_O.tree <- read.nexus(here("local/beast/o_1/Os.mcc.tre"))
-O_stats <- get_tracer_stats(here("local/beast/o_1/sero_0.log"))
+sero_O.tree <- read.nexus(here("local/beast/o_1/sero_o.mcc.tre"))
+O_stats <- get_tracer_stats(here("local/beast/o_1/sero_o.log.txt"))
 ```
 ```{r eval=FALSE}
 tt_sero_O <- infer_ttree(sero_O.tree,
@@ -154,8 +156,7 @@ tt_sero_O <- infer_ttree(sero_O.tree,
 saveRDS(tt_sero_O, here("local/assets/tt_sero_O.rds"))
 ```  
    
-## Get Networks 
-
+## Get Networks   
 ```{r echo=FALSE}
 tt_sero_A <- readRDS(here("local/assets/tt_sero_A.rds"))
 tt_sero_Asia1 <- readRDS(here("local/assets/tt_sero_Asia1.rds"))
@@ -180,13 +181,14 @@ sero_df <- readRDS(here("local/assets/sero_df.rds")) # from preprocessing
 
 animal_codes <- sero_df %>%
   filter(status == "Subclinical") %>%
-  mutate(host_id = label) %>%
-  select(host_id, animal, farm_code, status)
+  mutate(Status = status,
+         host_id = label) %>%
+  select(host_id, animal, farm_code, Status)
 
 all_networks <-left_join(all_networks, animal_codes, by = "host_id") %>%
   mutate(animal = as.character(animal),
-         status = if_else(is.na(status), "Clinical", status),
-         infected_ani = if_else(status == "Subclinical", animal, host_id))
+         Status = if_else(is.na(Status), "Clinical", Status),
+         infected_ani = if_else(Status == "Subclinical", animal, host_id))
 
 all_networks$infector_match <- with(animal_codes,
                                     animal[match(
@@ -205,40 +207,176 @@ edges <- data.frame(from = all_networks$infector_ani, to = all_networks$infected
 
 g <- graph_from_data_frame(edges, directed = TRUE)
 
-V(g)$status <- "Unknown"
+V(g)$Status <- "Unknown"
 
-V(g)$status[V(g)$name %in% all_networks$infected_ani] <- all_networks$status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
+V(g)$Status[V(g)$name %in% all_networks$infected_ani] <- all_networks$Status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
 
 V(g)$Serotype <- "Origin"
 V(g)$Serotype[V(g)$name %in% all_networks$infected_ani] <- 
   all_networks$Serotype[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
 
-V(g)$infection_date <- NA
+V(g)$infection_date <- as.Date("1995-07-10")
 V(g)$infection_date[V(g)$name %in% all_networks$infected_ani] <- 
   all_networks$infection_date[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
 
 V(g)$infection_date <- as.Date(V(g)$infection_date)
+
+V(g)$infection_steps <- as.integer(as.factor(V(g)$infection_date))
 ```
   
-First attempt  
+Tree network showing descent      
+```{r fig.width=11, fig.height=10}
+p <- ggraph(g, layout = 'tree') + 
+  geom_edge_diagonal(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
+                 color = 'gray20', alpha=0.9, 
+                 arrow = arrow(type = "closed", length = unit(2, "mm"))) +
+  geom_node_point(aes(color = Status, shape = Serotype), size = 4, alpha = 0.6) +
+  scale_color_manual(values = c("Subclinical" = "orange", 
+                                "Clinical" = "steelblue", 
+                                "Unknown" = "gray50")) +
+  #geom_node_label(aes(label = name), repel = TRUE) +
+  theme_void() +
+  labs(title = "FMDV Transmission Network",
+       subtitle = "Nodes are animals, arrows extend from infector to infectee")
+
+p
+```
+   
+Showing individuals with multiple infections (red color)       
 ```{r fig.width=10, fig.height=10}
+set.seed(1976)
+
+tg <- as_tbl_graph(g)
+
+tg <- tg %>%
+    activate(nodes) %>%  
+    mutate(in_degree = centrality_degree(mode = "in"),
+           multiple_incoming = ifelse(in_degree > 1, "multiple", "single"))
+
+tg <- tg %>%
+    mutate(alpha = ifelse(multiple_incoming == "multiple", 1, 0.6))
+
+layout <- layout_with_fr(as.igraph(tg), niter = 5000)
+
+layout_df <- as.data.frame(layout)
+colnames(layout_df) <- c("x", "y")
+
+spread_factor <- 25
+layout_df$x <- layout_df$x * spread_factor
+layout_df$y <- layout_df$y * spread_factor
+
+tg <- tg %>%
+    mutate(x = layout_df$x, y = layout_df$y)
+
+p <- ggraph(tg, x = x, y = y) + 
+  geom_edge_diagonal(aes(color = as.factor(from), alpha = 0.9), 
+                     start_cap = circle(3, 'mm'), end_cap = circle(3, 'mm'),
+                     arrow = arrow(type = "closed", length = unit(2, "mm")),
+                     show.legend = FALSE) +
+  geom_node_point(aes(color = Status, shape = Serotype, 
+                      fill = multiple_incoming, alpha = alpha),
+                      size = 3, stroke=1.5) +  
+  scale_shape_manual(values = c("A" = 21,
+                                "Asia1" = 22,
+                                "O" = 24,
+                                "Origin" = 13)) +
+  scale_color_manual(values = c("Subclinical" = "orange", 
+                                "Clinical" = "steelblue", 
+                                "Unknown" = "gray50")) +
+  scale_fill_manual(values = c("multiple" = "red", "single" = NA), guide = "none") +
+  scale_alpha_identity() +  
+  theme_void() +
+  labs(title = "FMDV Transmission Network",
+       subtitle = "Nodes are animals. Red indicates multiple infections")
+
+p
+```
+   
+Animated version
+```{r eval=FALSE, fig.width=10, fig.height=10}
+p <- ggraph(tg, x = x, y = y) + 
+  geom_edge_diagonal(aes(color = as.factor(from), alpha = 0.9), 
+                     start_cap = circle(3, 'mm'), end_cap = circle(3, 'mm'),
+                     arrow = arrow(type = "closed", length = unit(2, "mm")),
+                     show.legend = FALSE) +
+  geom_node_point(aes(color = Status, shape = Serotype, 
+                      fill = multiple_incoming, alpha = alpha),
+                      size = 3, stroke=1.5) +  
+  scale_shape_manual(values = c("A" = 21,
+                                "Asia1" = 22,
+                                "O" = 24,
+                                "Origin" = 13)) +
+  scale_color_manual(values = c("Subclinical" = "orange", 
+                                "Clinical" = "steelblue", 
+                                "Unknown" = "gray50")) +
+  scale_fill_manual(values = c("multiple" = "red", "single" = NA), guide = "none") +
+  scale_alpha_identity() +  
+  theme_void() +
+  labs(title = "FMDV Transmission Network",
+       subtitle = "Nodes are animals. Red indicates multiple infections") +
+  transition_time(infection_steps) +
+  labs(subtitle = 'Date: {frame_time}') +
+    shadow_mark(alpha = alpha / 2)
+
+ani_net <- animate(p, width = 800, height = 800, 
+                   fps = 10, end_pause = 20,
+                   renderer = gifski_renderer())
+
+anim_save(here("local/assets/coinfect_network_animation.gif"), ani_net)
+```
+```{r fig.width=10, fig.height=10}
+knitr::include_graphics(here("local/assets/coinfect_network_animation.gif"))
+```
+  
+#### To be continued...  
+
+```{r eval=FALSE,echo=FALSE}
+library(gganimate)
+
+p <- ggraph(tg, x = x, y = y) + 
+  geom_edge_diagonal(aes(color = as.factor(from), alpha = 0.9), 
+                     start_cap = circle(3, 'mm'), end_cap = circle(3, 'mm'),
+                     arrow = arrow(type = "closed", length = unit(2, "mm")),
+                     show.legend = FALSE) +
+  geom_node_point(aes(color = Status, shape = Serotype, 
+                      fill = multiple_incoming, alpha = alpha),
+                      size = 3, stroke=1.5) +  
+  scale_shape_manual(values = c("A" = 21,
+                                "Asia1" = 22,
+                                "O" = 24,
+                                "Origin" = 13)) +
+  scale_color_manual(values = c("Subclinical" = "orange", 
+                                "Clinical" = "steelblue", 
+                                "Unknown" = "gray50")) +
+  scale_fill_manual(values = c("multiple" = "red", "single" = NA), guide = "none") +
+  scale_alpha_identity() +  
+  theme_void() +
+  labs(title = "FMDV Transmission Network",
+       subtitle = "Nodes are animals. Red indicates multiple infections") +
+  transition_time(infection_steps) +
+  labs(subtitle = 'Date: {frame_time}') +
+    shadow_mark(alpha = alpha / 2)
+
+print(p)
 
 p <- ggraph(g, layout = 'tree') + 
   geom_edge_diagonal(start_cap = circle(2, 'mm'), end_cap = circle(2, 'mm'),
                  color = 'gray20', alpha=0.9, 
                  arrow = arrow(type = "closed", length = unit(2, "mm"))) +
-  geom_node_point(aes(color = status, shape = Serotype), size = 4, alpha = 0.6) +
+  geom_node_point(aes(color = Status, shape = Serotype), size = 4, alpha = 0.6) +
   scale_color_manual(values = c("Subclinical" = "orange", "Clinical" = "steelblue", "Unknown" = "gray50")) +
   #geom_node_label(aes(label = name), repel = TRUE) +
   theme_void() +
-  labs(title = "Network Graph",
-       subtitle = "Nodes: host_id, Edges: infector to host_id")
+  labs(title = "FMDV Transmission Network",
+       subtitle = "Nodes are animals, arrows extend from infector to infectee") +
+  transition_time(infection_steps) +
+  labs(subtitle = 'Date: {frame_time}') +
+    shadow_mark(alpha = alpha / 2, color = "gray40")
 
-p
+
+
+
 ```
-
-   
-#### To be continued...   
 
 ```{r eval=FALSE, echo=FALSE}
 library(gganimate)
@@ -248,7 +386,7 @@ edges <- data.frame(from = all_networks$infector_ani, to = all_networks$infected
 
 g <- graph_from_data_frame(edges, directed = TRUE)
 
-V(g)$status <- "Unknown"
+V(g)$Status <- "Unknown"
 V(g)$status[V(g)$name %in% all_networks$infected_ani] <- 
   all_networks$status[match(V(g)$name[V(g)$name %in% all_networks$infected_ani], all_networks$infected_ani)]
 
