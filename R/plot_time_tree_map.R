@@ -25,6 +25,7 @@ plot_time_tree_map <- function(tree, stats, metadata, title = "Time-Calibrated T
   # tree plot
   p <- ggtree(tree, mrsd = convert_decimal_date(tree_mrsd), as.Date = FALSE) %<+% metadata +
     geom_tippoint(aes(color = farm_code), size = 3) +
+    scale_color_manual(values = farm_palette) +
     geom_tiplab(aes(label = label), size = 2, hjust = -0.3) +
     theme_tree2() +  
     scale_x_continuous(breaks = seq(seq_min, seq_max, 2), 
