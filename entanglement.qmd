@@ -428,4 +428,59 @@ entangle_tab %>%
 
 ```
 
+## Matrix View
+```{r fig.height=6, fig.width=10}
+#| label: fig-entangle_scores
+#| fig-cap: "Compare entanglement scores."
+#| 
+mat_view <- entangle_tab %>%
+  separate(Compared, into = c("Var1", "Var2"), sep = " vs. ", remove = FALSE)
+
+mat_view <- mat_view %>%
+  select(Var1, Var2, Score)
+
+unique_vars <- unique(c(mat_view$Var1, mat_view$Var2))
+self_comparisons <- data.frame(
+  Var1 = unique_vars,
+  Var2 = unique_vars,
+  Score = 0  # self-comparisons
+)
+
+mat_view <- bind_rows(mat_view, self_comparisons)
+
+mat_view <- bind_rows(
+  mat_view,
+  mat_view %>% rename(Var1 = Var2, Var2 = Var1)
+)
+
+mat_view <- mat_view %>%
+  distinct()
+
+mat_view$Var1 <- gsub("_", " ", mat_view$Var1)
+mat_view$Var2 <- gsub("_", " ", mat_view$Var2)
+
+ggplot(mat_view, aes(Var1, Var2, fill = Score)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "D") +
+  theme_classic() +
+  theme(
+    plot.margin = unit(c(2, 8, 5, 8), "mm"),
+    axis.title.x = element_text(size = 24, face = "bold"),
+    axis.title.y = element_text(size = 24, face = "bold"),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    legend.direction = "vertical",
+    legend.position = "right",
+    strip.text = element_blank(), 
+    strip.background = element_blank(),
+    legend.key.size = unit(2, "line"),
+    legend.key.width = unit(1, "line"),
+    legend.text = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 28, face = "bold")
+  ) +
+  labs(title = "Entanglement Scores",
+       x = " ", y = " ", fill = "Entanglement")
+```
+
 

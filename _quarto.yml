@@ -12,6 +12,8 @@ website:
         text: Entanglement
       - href: time_tree.qmd
         text: Phylogeny 
+      - href: segments.qmd
+        text: Segments
       - href: networks.qmd
         text: Networks 
     right:

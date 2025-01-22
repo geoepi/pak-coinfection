@@ -1,0 +1,435 @@
+---
+title: "Segments"
+description: "Post analysis visualizations of segment phylogenies."
+format:
+  html: 
+    df-print: kable
+    code-fold: show
+    code-summary: "Hide code"
+    code-overflow: wrap
+    toc-title: Page Contents
+    toc: true
+    toc-depth: 2
+    toc-location: right
+    number-sections: false
+    html-math-method: katex
+    smooth-scroll: true
+editor: source
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(here)
+library(tidyverse)
+options(dplyr.summarise.inform = FALSE)
+library(ape)
+library(phangorn)
+library(ggtree)
+library(ggmap)
+library(sf)
+library(ggspatial)
+library(dendextend)
+library(pals)
+library(viridis)
+library(gt)
+library(circlize)
+library(patchwork)
+library(TransPhylo)
+
+## Custom Functions
+source(here("R/utilities.R"))
+source_dir(here("R"))
+```
+
+## Map API
+```{r}
+# api to access background maps  
+map_api <- yaml::read_yaml(here("local", "secrets.yaml"))
+register_stadiamaps(key = map_api$stadi_api)
+has_stadiamaps_key()
+```
+
+## Read Gene Trees   
+Segment specific phylogenies.  
+```{r}
+# divergence time (capsid)
+sero_A.tree <- read.nexus(here("local/beast/a_1/sero_a.mcc.tre"))
+sero_Asia1.tree <- read.nexus(here("local/beast/asia1_1/sero_asia1.mcc.tre")) 
+sero_O.tree <- read.nexus(here("local/beast/o_1/sero_o.mcc.tre"))
+
+# phylogeny list from directory
+tree_files <- list.files(here("local/paktrees"), pattern="_rev\\.nex$")
+
+# read ML trees 
+seg_A_capsid.tree <- read.nexus(here("local/paktrees", tree_files[6]))
+seg_Asia1_capsid.tree <- read.nexus(here("local/paktrees", tree_files[7]))
+seg_O_capsid.tree <- read.nexus(here("local/paktrees", tree_files[9]))
+IRES_Lpro.tree <- read.nexus(here("local/paktrees", tree_files[8]))
+seg_2C.tree <- read.nexus(here("local/paktrees", tree_files[1]))
+seg_3A.tree <- read.nexus(here("local/paktrees", tree_files[2]))
+seg_3C.tree <- read.nexus(here("local/paktrees", tree_files[3]))
+seg_3D.tree <- read.nexus(here("local/paktrees", tree_files[4]))
+
+# gene trees
+gene_trees.lst <- list(
+  seg_A = seg_A_capsid.tree,
+  seg_Asia1 = seg_Asia1_capsid.tree,
+  seg_O = seg_O_capsid.tree,
+  IRES_Lpro = IRES_Lpro.tree,
+  segment_2C = seg_2C.tree,
+  segment_3A = seg_3A.tree,
+  segment_3C = seg_3C.tree,
+  segment_3D = seg_3D.tree
+)
+```
+  
+## Metadata  
+Tree metadata on farm locations and sample processing.
+```{r}
+# sample Metadata
+sero_meta <- readRDS(here("local/assets/sero_df.rds"))
+
+sero_meta %>%
+  group_by(status) %>%
+  summarise(Count = length(status))
+
+# farm Coordinates
+farm_coords <- read.csv(here("local/farms_locs.csv")) %>%
+  select(farm_code, coord_x, coord_y)
+```
+
+## Subclinical Samples 
+Preclinical samples are of greatest interest.
+```{r}
+subclinical_df <- sero_meta %>%
+  filter(status == "Subclinical")
+
+dim(subclinical_df)
+
+sub_trees.lst <- lapply(gene_trees.lst, function(tree) {
+  tips_to_keep <- subclinical_df$label
+  drop.tip(tree, setdiff(tree$tip.label, tips_to_keep))
+})
+
+names(sub_trees.lst) <- names(gene_trees.lst)
+
+short_sub_trees.lst <- sub_trees.lst[!(names(sub_trees.lst) %in% 
+                                         c("seg_A", "seg_Asia1", "seg_O"))]
+```
+
+## RF Distances  
+A tree comparison metric.  As with [entanglement](https://geoepi.github.io/pak-coinfection/entanglement.html), the lower thhe values, the more similiar the trees.  
+```{r}
+rf_matrix <- sapply(short_sub_trees.lst, function(tree1) {
+  sapply(short_sub_trees.lst, function(tree2) {
+    phangorn::path.dist(tree1, tree2)
+  })
+})
+
+rf_df <- as.data.frame(as.table(as.matrix(rf_matrix)))
+
+rf_df$Var1 <- gsub("segment_", " ", rf_df$Var1)
+rf_df$Var1 <- gsub("_", " ", rf_df$Var1)
+
+rf_df$Var2 <- gsub("segment_", " ", rf_df$Var2)
+rf_df$Var2 <- gsub("_", " ", rf_df$Var2)
+
+
+ggplot(rf_df, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_viridis_c(option = "F") +
+  theme_classic() +
+  theme(
+    plot.margin = unit(c(2, 8, 5, 8), "mm"),
+    axis.title.x = element_text(size = 24, face = "bold"),
+    axis.title.y = element_text(size = 24, face = "bold"),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    legend.direction = "vertical",
+    legend.position = "right",
+    strip.text = element_blank(), 
+    strip.background = element_blank(),
+    legend.key.size = unit(2, "line"),
+    legend.key.width = unit(1, "line"),
+    legend.text = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 28, face = "bold")
+  ) +
+  labs(title = "Robinson-Foulds Distance",
+       x = " ", y = " ", fill = "RF Distance")
+```
+
+
+## Map and Tree  
+Comparing locations.  Working out the map code...
+```{r}
+# Load the Tree
+sero_O.tree <- read.nexus(here("local/beast/o_1/sero_o.mcc.tre"))
+sero_O.tree <- drop.tip(sero_O.tree, tip = c("JX170756", "KR149704", "MT944981"))
+
+# tree stats
+check_stats_O <- get_tracer_stats(here("local/beast/o_1/sero_o.log.txt"))
+
+# tips to data frame
+tree_meta_O <- as.data.frame(sero_O.tree$tip.label)
+names(tree_meta_O) <- "tip_label"
+
+# metadata and exclude outgroups
+sero_meta_filtered <- sero_meta %>%
+  mutate(tip_label = label) %>%
+  filter(tip_label %in% sero_O.tree$tip.label,
+         !tip_label %in% c("JX170756", "KR149704", "MT944981"))
+
+# combine metadata
+farm_data <- farm_coords %>%
+  left_join(sero_meta_filtered, by = "farm_code") %>%
+  mutate(has_sample = !is.na(tip_label))
+
+# color palette for farm_code
+farm_color_codes <- unique(farm_data$farm_code)
+n_farms <- length(farm_color_codes)
+farm_palette <- setNames(glasbey(n_farms), farm_color_codes)
+
+farm_match <- farm_data %>%
+  select(tip_label, farm_code)
+
+# Merge Tree Metadata with Farm Data
+tree_meta_O <- tree_meta_O %>%
+  left_join(farm_data, by = "tip_label") %>%
+  mutate(
+    farm_code = ifelse(is.na(farm_code), "Outgroup", farm_code),
+    has_sample = !is.na(farm_code) & farm_code != "Outgroup"
+  ) 
+
+tree_meta_O <- tree_meta_O %>%
+  rename(tip_label_meta = label) %>%
+  rename(label = tip_label) 
+
+# to sf Object
+farms_sf <- st_as_sf(farm_data, coords = c("coord_x", "coord_y"), crs = 4326)
+
+tree_plot <- plot_time_tree_map(sero_O.tree, check_stats_O, tree_meta_O)
+```
+
+```{r fig.height=10, fig.width=8}
+#| label: fig-treeview2
+#| fig-cap: "Serotype O capsid (VP4-VP1)."
+#|  
+tree_plot
+```
+  
+Oragianize map data.  
+```{r}
+# seed
+set.seed(1976)
+farms_sf_jitter <- farms_sf %>%
+  mutate(
+    x = st_coordinates(.)[, 1],
+    y = st_coordinates(.)[, 2]
+  )
+
+buffer_set <- farm_coords %>%
+  mutate(temp_x = coord_x) %>%
+  select(-coord_x) %>%
+  mutate(
+    coord_x = coord_y,
+    coord_y = temp_x
+  ) %>%
+  select(-temp_x) 
+
+bbox <- calculate_bounding_box(buffer_set, 1)
+
+bbox_coords <- c(left = bbox$min_lon, bottom = bbox$min_lat, 
+                 right = bbox$max_lon, top = bbox$max_lat)
+
+background_map <- get_map(location = bbox_coords, 
+                          source = "stadia", maptype = "stamen_toner_lite")
+
+
+map_plot <- ggmap(background_map) +
+  geom_sf(data = farms_sf_jitter %>% filter(!has_sample), 
+          fill = "black", color = "black", size = 3, shape = 21, inherit.aes = FALSE) +
+  geom_sf(data = farms_sf_jitter %>% filter(has_sample), 
+          aes(fill = farm_code), size = 3, shape = 21, color = "transparent", 
+          inherit.aes = FALSE) +
+  geom_jitter(
+    data = farms_sf_jitter %>% filter(has_sample),
+    aes(x = x, y = y, fill = farm_code),
+    size = 3, shape = 21, color = "transparent", width = 0.001, height = 0.001
+  ) +
+  scale_fill_manual(values = farm_palette) +
+  theme_classic() +
+  theme(
+    plot.margin = unit(c(2, 8, 5, 8), "mm"),
+    axis.title.x = element_text(size = 24, face = "bold"),
+    axis.title.y = element_text(size = 24, face = "bold"),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    legend.direction = "vertical",
+    legend.position = "right",
+    strip.text = element_blank(), 
+    strip.background = element_blank(),
+    legend.key.size = unit(2, "line"),
+    legend.key.width = unit(3, "line"),
+    legend.text = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 28, face = "bold")
+  ) +
+  labs(title = "Farm Locations", fill = "Farm Code",
+       x = "Longitude", y = "Latitude") +
+  annotation_scale(location = "tl", width_hint = 0.4) +
+  coord_sf(crs = 4326)
+```
+
+```{r fig.height=8, fig.width=10}
+#| label: fig-farm_map
+#| fig-cap: "Map of all sample locations."
+#|  
+map_plot
+```
+  
+```{r fig.height=10, fig.width=10}
+#| label: fig-farm_map_tree
+#| fig-cap: "Phylogeny with map."
+#|  
+combined_plot <- tree_plot / map_plot +
+  plot_layout(heights = c(2, 2))
+
+combined_plot
+```
+
+
+```{r eval=FALSE, echo=FALSE}
+# clean version of map
+
+farms_sf_unique <- farms_sf %>%
+  distinct(farm_code, .keep_all = TRUE)
+
+
+set.seed(1976)
+uniq_farms_jitter <- farms_sf_unique %>%
+  mutate(
+    x = st_coordinates(.)[, 1],
+    y = st_coordinates(.)[, 2]
+  )
+
+
+map_plot <- ggmap(background_map) +
+  geom_jitter(
+    data = uniq_farms_jitter,
+    aes(x = x, y = y, fill = farm_code),
+    size = 5, shape = 21, alpha = 0.8, color = "transparent", 
+    width = 0.005, height = 0.005
+  ) +
+  scale_fill_manual(values = farm_palette) +
+  theme_classic() +
+  theme(
+    plot.margin = unit(c(2, 8, 5, 8), "mm"),
+    axis.title.x = element_text(size = 24, face = "bold"),
+    axis.title.y = element_text(size = 24, face = "bold"),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    legend.direction = "vertical",
+    legend.position = "right",
+    strip.text = element_blank(), 
+    strip.background = element_blank(),
+    legend.key.size = unit(2, "line"),
+    legend.key.width = unit(3, "line"),
+    legend.text = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 16, face = "bold"),
+    plot.title = element_text(size = 28, face = "bold")
+  ) +
+  labs(title = " ", fill = "Farm Location",
+       x = "Longitude", y = "Latitude") +
+  annotation_scale(location = "tl", width_hint = 0.4) +
+  coord_sf(crs = 4326)
+
+map_plot
+```
+
+
+
+## Segment Trees  
+View trees in panel.
+```{r}
+plot_tree <- function(tree, metadata, title) {
+  p <- ggtree(tree, branch.length='none', layout='circular') %<+% metadata +
+    geom_tippoint(data = ~subset(., !is.na(farm_code) & farm_code != "NA"), 
+              aes(color = farm_code, shape = serotype), size = 2) +
+    scale_color_manual(values = farm_palette) +
+    scale_shape_manual(values = c("A" = 15, "Asia1" = 16, "O" = 17)) +
+    ggtitle(title) +
+    theme(#plot.title = element_blank,
+          plot.title = element_text(hjust = 0.5),
+          legend.position = "none")
+  
+  return(p)
+}
+
+length(unique(subclinical_df$farm_code))
+
+# individual plots
+gene_plots <- lapply(names(sub_trees.lst), function(name) {
+  plot_tree(sub_trees.lst[[name]], subclinical_df, title = name)
+})
+```
+
+```{r fig.height=10, fig.width=10}
+#| label: fig-seg_trees
+#| fig-cap: "Segment phylogenies.  Tips color-coded by farm."
+#|  
+
+combined_plot <- wrap_plots(gene_plots, ncol = 4)
+combined_plot
+```
+
+## Chord Diagram
+```{r warning=FALSE, message=FALSE}
+links_df <- do.call(rbind, lapply(names(short_sub_trees.lst), function(gene) {
+  tree <- short_sub_trees.lst[[gene]]
+  subclinical_df %>%
+    filter(label %in% tree$tip.label) %>%
+    mutate(gene = gene,
+           label = gsub("_pro", "", label), 
+           animal= paste0("samp_", animal)) %>%
+    select(label, farm_code, serotype, animal, gene)
+}))
+
+
+serotype_palette <- setNames(viridis(3, option = "E"), unique(links_df$serotype))
+
+animal_palette <- setNames(viridis(length(unique(links_df$animal)), 
+                                   option = "D"), unique(links_df$animal))
+```
+
+```{r fig.height=10, fig.width=10, warning=FALSE, message=FALSE}
+#| label: fig-chords
+#| fig-cap: "Both farms and some animals show mixing"
+#|  
+plot_chords("IRES_Lpro", links_df, serotype_palette, farm_palette, animal_palette)
+
+```
+
+```{r echo=FALSE, eval=FALSE}
+# Farm legend for manuscript
+
+dummy_df <- data.frame(
+  farm_code = unique(links_df$farm_code),
+  x = 1:length(unique(links_df$farm_code)),
+  y = 1:length(unique(links_df$farm_code))
+)
+
+
+ggplot(dummy_df, aes(x = x, y = y, fill = farm_code)) +
+  geom_point(shape = 22, size = 5) +
+  scale_fill_manual(values = farm_palette, name = "Farm Code") +
+  theme_classic() +
+  theme(
+    legend.direction = "horizontal",
+    legend.position = "bottom",
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12)
+  ) +
+  guides(fill = guide_legend(nrow = 2))
+```

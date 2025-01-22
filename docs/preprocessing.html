@@ -156,6 +156,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  <span class="menu-text">Phylogeny</span></a>
   </li>  
   <li class="nav-item">
+    <a class="nav-link" href="./segments.html">
+ <span class="menu-text">Segments</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="./networks.html">
  <span class="menu-text">Networks</span></a>
   </li>  
@@ -297,24 +301,31 @@ pre {
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<div class="cell">
+<details open="">
+<summary>Hide code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(farms_locs, <span class="fu">here</span>(<span class="st">"local/farms_locs.csv"</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(farm_file, <span class="fu">here</span>(<span class="st">"local/animals_locs.csv"</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <section id="format-data-for-mapping" class="level3">
 <h3 class="anchored" data-anchor-id="format-data-for-mapping">Format data for mapping</h3>
 <p>The function <em>calculate_bounding_box()</em> helps with conversion and padding dtermination for the map.</p>
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use api to access background maps  </span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>map_api <span class="ot">&lt;-</span> yaml<span class="sc">::</span><span class="fu">read_yaml</span>(<span class="fu">here</span>(<span class="st">"local"</span>, <span class="st">"secrets.yaml"</span>))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">register_stadiamaps</span>(<span class="at">key =</span> map_api<span class="sc">$</span>stadi_api)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># has_stadiamaps_key()</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> <span class="fu">calculate_bounding_box</span>(farms_locs, <span class="dv">1</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>bbox_coords <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">left =</span> bbox<span class="sc">$</span>min_lon, <span class="at">bottom =</span> bbox<span class="sc">$</span>min_lat, </span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">right =</span> bbox<span class="sc">$</span>max_lon, <span class="at">top =</span> bbox<span class="sc">$</span>max_lat)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>background_map <span class="ot">&lt;-</span> <span class="fu">get_map</span>(<span class="at">location =</span> bbox_coords, </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">source =</span> <span class="st">"stadia"</span>, <span class="at">maptype =</span> <span class="st">"stamen_terrain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use api to access background maps  </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>map_api <span class="ot">&lt;-</span> yaml<span class="sc">::</span><span class="fu">read_yaml</span>(<span class="fu">here</span>(<span class="st">"local"</span>, <span class="st">"secrets.yaml"</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">register_stadiamaps</span>(<span class="at">key =</span> map_api<span class="sc">$</span>stadi_api)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># has_stadiamaps_key()</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> <span class="fu">calculate_bounding_box</span>(farms_locs, <span class="dv">1</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>bbox_coords <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">left =</span> bbox<span class="sc">$</span>min_lon, <span class="at">bottom =</span> bbox<span class="sc">$</span>min_lat, </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">right =</span> bbox<span class="sc">$</span>max_lon, <span class="at">top =</span> bbox<span class="sc">$</span>max_lat)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>background_map <span class="ot">&lt;-</span> <span class="fu">get_map</span>(<span class="at">location =</span> bbox_coords, </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">source =</span> <span class="st">"stadia"</span>, <span class="at">maptype =</span> <span class="st">"stamen_terrain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>ℹ © Stadia Maps © Stamen Design © OpenMapTiles © OpenStreetMap contributors.</code></pre>
@@ -326,10 +337,10 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_study_area</span>(background_map, farms_locs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_study_area</span>(background_map, farms_locs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="preprocessing_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="768"></p>
+<p><img src="preprocessing_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 </section>
@@ -339,13 +350,13 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>new_background <span class="ot">&lt;-</span> <span class="fu">get_map</span>(<span class="at">location =</span> bbox_coords, </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">source =</span> <span class="st">"stadia"</span>, <span class="at">maptype =</span> <span class="st">"stamen_toner"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_study_area</span>(new_background, farms_locs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>new_background <span class="ot">&lt;-</span> <span class="fu">get_map</span>(<span class="at">location =</span> bbox_coords, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">source =</span> <span class="st">"stadia"</span>, <span class="at">maptype =</span> <span class="st">"stamen_toner"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_study_area</span>(new_background, farms_locs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="preprocessing_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="768"></p>
+<p><img src="preprocessing_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
 </section>
@@ -356,67 +367,68 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>all_serotypes_tree <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">5</span>]))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  all_serotypes_tree<span class="sc">$</span>tip.label</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(sero_df) <span class="ot">&lt;-</span> <span class="st">"label"</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># get animal and sample number from tip label</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> sero_df  <span class="sc">%&gt;%</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_count</span>(label, <span class="st">"/"</span>) <span class="sc">&gt;=</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parts =</span> <span class="fu">str_split</span>(label, <span class="st">"/"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">string =</span> <span class="fu">sapply</span>(parts, <span class="cf">function</span>(x) <span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">3</span>) x[<span class="dv">4</span>] <span class="cf">else</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal =</span> <span class="fu">as.integer</span>(</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), string))) <span class="sc">%&gt;%</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">2</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="cn">NA_character_</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>parts)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># fix mixed date formats</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>farm_file <span class="ot">&lt;-</span> farm_file <span class="sc">%&gt;%</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"samp_date_"</span>), <span class="sc">~</span> <span class="fu">format</span>(<span class="fu">dmy</span>(.), <span class="st">"%Y-%m-%d"</span>)))</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co"># table by sample and animal</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>samp_date_table <span class="ot">&lt;-</span> farm_file <span class="sc">%&gt;%</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(animal, samp_date_1, samp_date_2, samp_date_3, samp_date_4) <span class="sc">%&gt;%</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span>animal,</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"sample_txt"</span>,</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"samp_date"</span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">substr</span>(sample_txt, <span class="dv">11</span>, <span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sample_txt)</span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(sero_df, samp_date_table, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"animal"</span>, <span class="st">"sample"</span>))</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>sero_df<span class="sc">$</span>samp_date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(sero_df<span class="sc">$</span>samp_date)</span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>farm_file<span class="sc">$</span>farm_code <span class="ot">&lt;-</span> <span class="fu">with</span>(farms_locs,</span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                            farm_code[<span class="fu">match</span>(</span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                              farm_file<span class="sc">$</span>farm_name,</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                              farm_name)])</span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>sero_df<span class="sc">$</span>farm_code <span class="ot">&lt;-</span> <span class="fu">with</span>(farm_file,</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>                          farm_code[<span class="fu">match</span>(</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>                             sero_df<span class="sc">$</span>animal,</span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>                             animal)])</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status =</span> <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="st">"_pro$"</span>, label), <span class="st">"Subclinical"</span>, <span class="st">"Clinical"</span>),</span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>         <span class="at">serotype =</span> <span class="fu">sub</span>(<span class="st">"/.*"</span>, <span class="st">""</span>, label))</span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>sub_only <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status <span class="sc">==</span> <span class="st">"Subclinical"</span>)</span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>sub_only<span class="sc">$</span>serotype <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"/.*"</span>, <span class="st">""</span>, sub_only<span class="sc">$</span>label)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>all_serotypes_tree <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">5</span>]))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  all_serotypes_tree<span class="sc">$</span>tip.label</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(sero_df) <span class="ot">&lt;-</span> <span class="st">"label"</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># get animal and sample number from tip label</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> sero_df  <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_count</span>(label, <span class="st">"/"</span>) <span class="sc">&gt;=</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parts =</span> <span class="fu">str_split</span>(label, <span class="st">"/"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">string =</span> <span class="fu">sapply</span>(parts, <span class="cf">function</span>(x) <span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">3</span>) x[<span class="dv">4</span>] <span class="cf">else</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal =</span> <span class="fu">as.integer</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), string))) <span class="sc">%&gt;%</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">2</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="cn">NA_character_</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>parts)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co"># fix mixed date formats</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>farm_file <span class="ot">&lt;-</span> farm_file <span class="sc">%&gt;%</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"samp_date_"</span>), <span class="sc">~</span> <span class="fu">format</span>(<span class="fu">dmy</span>(.), <span class="st">"%Y-%m-%d"</span>)))</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co"># table by sample and animal</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>samp_date_table <span class="ot">&lt;-</span> farm_file <span class="sc">%&gt;%</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(animal, samp_date_1, samp_date_2, samp_date_3, samp_date_4) <span class="sc">%&gt;%</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="sc">-</span>animal,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"sample_txt"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"samp_date"</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">substr</span>(sample_txt, <span class="dv">11</span>, <span class="dv">11</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sample_txt)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> <span class="fu">left_join</span>(sero_df, samp_date_table, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"animal"</span>, <span class="st">"sample"</span>))</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>sero_df<span class="sc">$</span>samp_date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(sero_df<span class="sc">$</span>samp_date)</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>farm_file<span class="sc">$</span>farm_code <span class="ot">&lt;-</span> <span class="fu">with</span>(farms_locs,</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>                            farm_code[<span class="fu">match</span>(</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>                              farm_file<span class="sc">$</span>farm_name,</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>                              farm_name)])</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>sero_df<span class="sc">$</span>farm_code <span class="ot">&lt;-</span> <span class="fu">with</span>(farm_file,</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>                          farm_code[<span class="fu">match</span>(</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>                             sero_df<span class="sc">$</span>animal,</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>                             animal)])</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>sero_df <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status =</span> <span class="fu">ifelse</span>(<span class="fu">grepl</span>(<span class="st">"_pro$"</span>, label), <span class="st">"Subclinical"</span>, <span class="st">"Clinical"</span>),</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>         <span class="at">serotype =</span> <span class="fu">sub</span>(<span class="st">"/.*"</span>, <span class="st">""</span>, label))</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>sub_only <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status <span class="sc">==</span> <span class="st">"Subclinical"</span>)</span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>sub_only<span class="sc">$</span>serotype <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"/.*"</span>, <span class="st">""</span>, sub_only<span class="sc">$</span>label)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>save a copy</p>
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(sero_df, <span class="fu">here</span>(<span class="st">"local/assets/sero_df.rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(sero_df, <span class="fu">here</span>(<span class="st">"local/assets/sero_df.rds"</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(farms_locs, <span class="fu">here</span>(<span class="st">"local/farms_locs.csv"</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="co-infected-animals" class="level3">
@@ -425,45 +437,44 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>coinf_set <span class="ot">&lt;-</span> sub_only <span class="sc">%&gt;%</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(animal) <span class="sc">%&gt;%</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Infections =</span> <span class="fu">length</span>(serotype)) <span class="sc">%&gt;%</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Infections <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(animal) <span class="sc">%&gt;%</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Item, animal, Infections)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>coinf_set <span class="ot">&lt;-</span> sub_only <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(animal) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Infections =</span> <span class="fu">length</span>(serotype)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Infections <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(animal) <span class="sc">%&gt;%</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Item, animal, Infections)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>coinf_set <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"Sampled FMDV by Animal"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_width</span>(<span class="fu">starts_with</span>(<span class="st">"animal"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">100</span>),</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"Infections"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">everything</span>() <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">95</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(<span class="at">table.font.size =</span> <span class="st">"small"</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">row_group.font.size =</span> <span class="st">"small"</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">stub.font.size =</span> <span class="st">"small"</span>,</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.size =</span> <span class="st">"medium"</span>,</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.size =</span> <span class="st">"large"</span>,</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">2</span>),</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.weight =</span> <span class="st">"bold"</span>,</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">'gray'</span>)  <span class="sc">%&gt;%</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_caption</span>(<span class="at">caption =</span> <span class="fu">md</span>(<span class="st">"Table lists subclinical animals sampled to have multiple infections.  May be sequential or coinfections, and may be from the same or different FMDVs. The Infections columns lits the number sampled.  Detailed records for these animals are in the next table."</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>coinf_set <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"Sampled FMDV by Animal"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_width</span>(<span class="fu">starts_with</span>(<span class="st">"animal"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">100</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"Infections"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">everything</span>() <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">95</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(<span class="at">table.font.size =</span> <span class="st">"small"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">row_group.font.size =</span> <span class="st">"small"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">stub.font.size =</span> <span class="st">"small"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.size =</span> <span class="st">"medium"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.size =</span> <span class="st">"large"</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">2</span>),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.weight =</span> <span class="st">"bold"</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">'gray'</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_caption</span>(<span class="at">caption =</span> <span class="fu">md</span>(<span class="st">"Table lists subclinical animals sampled to have multiple infections.  May be sequential or coinfections, and may be from the same or different FMDVs. The Infections columns lits the number sampled.  Detailed records for these animals are in the next table."</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 
 <div style="all:initial" ;="">
-<div id="vepopxqfao" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="yiuptvipva" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   <table class="gt_table" style="-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: small; font-weight: normal; font-style: normal; background-color: #FFFFFF; border-top-style: solid; border-top-width: 2px; border-top-color: #5F5F5F; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; table-layout: fixed; width: 0px;" data-quarto-disable-processing="false" data-quarto-bootstrap="false" width="0" bgcolor="#FFFFFF">
-  <caption><div data-qmd-base64="VGFibGUgbGlzdHMgc3ViY2xpbmljYWwgYW5pbWFscyBzYW1wbGVkIHRvIGhhdmUgbXVsdGlwbGUgaW5mZWN0aW9ucy4gIE1heSBiZSBzZXF1ZW50aWFsIG9yIGNvaW5mZWN0aW9ucywgYW5kIG1heSBiZSBmcm9tIHRoZSBzYW1lIG9yIGRpZmZlcmVudCBGTURWcy4gVGhlIEluZmVjdGlvbnMgY29sdW1ucyBsaXRzIHRoZSBudW1iZXIgc2FtcGxlZC4gIERldGFpbGVkIHJlY29yZHMgZm9yIHRoZXNlIGFuaW1hbHMgYXJlIGluIHRoZSBuZXh0IHRhYmxlLg=="><div class="gt_from_md"><p style="margin: 0; padding: 0; margin-top: 0; margin-bottom: 0;">Table lists subclinical animals sampled to have multiple infections.  May be sequential or coinfections, and may be from the same or different FMDVs. The Infections columns lits the number sampled.  Detailed records for these animals are in the next table.</p>
-</div></div></caption>
+  <caption><span data-qmd-base64="VGFibGUgbGlzdHMgc3ViY2xpbmljYWwgYW5pbWFscyBzYW1wbGVkIHRvIGhhdmUgbXVsdGlwbGUgaW5mZWN0aW9ucy4gIE1heSBiZSBzZXF1ZW50aWFsIG9yIGNvaW5mZWN0aW9ucywgYW5kIG1heSBiZSBmcm9tIHRoZSBzYW1lIG9yIGRpZmZlcmVudCBGTURWcy4gVGhlIEluZmVjdGlvbnMgY29sdW1ucyBsaXRzIHRoZSBudW1iZXIgc2FtcGxlZC4gIERldGFpbGVkIHJlY29yZHMgZm9yIHRoZXNlIGFuaW1hbHMgYXJlIGluIHRoZSBuZXh0IHRhYmxlLg=="><span class="gt_from_md">Table lists subclinical animals sampled to have multiple infections.  May be sequential or coinfections, and may be from the same or different FMDVs. The Infections columns lits the number sampled.  Detailed records for these animals are in the next table.</span></span></caption>
   <colgroup>
     <col style="width:95px;">
     <col style="width:100px;">
@@ -471,8 +482,7 @@ pre {
   </colgroup>
   <thead style="border-style: none;">
     <tr class="gt_heading" style="border-style: none; background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3;" bgcolor="#FFFFFF" align="center">
-      <td colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border" style="border-style: none; color: #333333; font-size: large; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; background-color: #FFFFFF; text-align: center; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; font-weight: normal;" bgcolor="#FFFFFF" align="center"><div data-qmd-base64="U2FtcGxlZCBGTURWIGJ5IEFuaW1hbA=="><div class="gt_from_md"><p style="margin: 0; padding: 0; margin-top: 0; margin-bottom: 0;">Sampled FMDV by Animal</p>
-</div></div></td>
+      <td colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border" style="border-style: none; color: #333333; font-size: large; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; background-color: #FFFFFF; text-align: center; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; font-weight: normal;" bgcolor="#FFFFFF" align="center"><span data-qmd-base64="U2FtcGxlZCBGTURWIGJ5IEFuaW1hbA=="><span class="gt_from_md">Sampled FMDV by Animal</span></span></td>
     </tr>
     
     <tr class="gt_col_headings" style="border-style: none; border-top-style: solid; border-top-width: 2px; border-top-color: #5F5F5F; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3;">
@@ -551,38 +561,37 @@ pre {
 </div>
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sub_only <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(animal <span class="sc">%in%</span> coinf_set<span class="sc">$</span>animal) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>string) <span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(animal) <span class="sc">%&gt;%</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"Subclinical with Multiple Infections"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_width</span>(<span class="fu">starts_with</span>(<span class="st">"label"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">250</span>),</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"animal"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"sample"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"farm_code"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">100</span>),</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"samp_date"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">100</span>),</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>             <span class="fu">everything</span>() <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">95</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(<span class="at">table.font.size =</span> <span class="st">"small"</span>,</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">row_group.font.size =</span> <span class="st">"small"</span>,</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">stub.font.size =</span> <span class="st">"small"</span>,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.size =</span> <span class="st">"medium"</span>,</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.size =</span> <span class="st">"large"</span>,</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>              <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">2</span>),</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.weight =</span> <span class="st">"bold"</span>,</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">'gray'</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_caption</span>(<span class="at">caption =</span> <span class="fu">md</span>(<span class="st">"Table lists indiviual records for animals sampled to have multiple infections.  Detailed version of previous table showing counts."</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sub_only <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(animal <span class="sc">%in%</span> coinf_set<span class="sc">$</span>animal) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>string) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(animal) <span class="sc">%&gt;%</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">"Subclinical with Multiple Infections"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_width</span>(<span class="fu">starts_with</span>(<span class="st">"label"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">250</span>),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"animal"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"sample"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">90</span>),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"farm_code"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">100</span>),</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>             <span class="fu">starts_with</span>(<span class="st">"samp_date"</span>) <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">100</span>),</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>             <span class="fu">everything</span>() <span class="sc">~</span> <span class="fu">px</span>(<span class="dv">95</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_options</span>(<span class="at">table.font.size =</span> <span class="st">"small"</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">row_group.font.size =</span> <span class="st">"small"</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">stub.font.size =</span> <span class="st">"small"</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.size =</span> <span class="st">"medium"</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.size =</span> <span class="st">"large"</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>              <span class="at">data_row.padding =</span> <span class="fu">px</span>(<span class="dv">2</span>),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">heading.title.font.weight =</span> <span class="st">"bold"</span>,</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>              <span class="at">column_labels.font.weight =</span> <span class="st">"bold"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">opt_stylize</span>(<span class="at">style =</span> <span class="dv">6</span>, <span class="at">color =</span> <span class="st">'gray'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_caption</span>(<span class="at">caption =</span> <span class="fu">md</span>(<span class="st">"Table lists indiviual records for animals sampled to have multiple infections.  Detailed version of previous table showing counts."</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 
 <div style="all:initial" ;="">
-<div id="szqhufkmzp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="fjwgezxqki" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   <table class="gt_table" style="-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: small; font-weight: normal; font-style: normal; background-color: #FFFFFF; border-top-style: solid; border-top-width: 2px; border-top-color: #5F5F5F; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; table-layout: fixed; width: 0px;" data-quarto-disable-processing="false" data-quarto-bootstrap="false" width="0" bgcolor="#FFFFFF">
-  <caption><div data-qmd-base64="VGFibGUgbGlzdHMgaW5kaXZpdWFsIHJlY29yZHMgZm9yIGFuaW1hbHMgc2FtcGxlZCB0byBoYXZlIG11bHRpcGxlIGluZmVjdGlvbnMuICBEZXRhaWxlZCB2ZXJzaW9uIG9mIHByZXZpb3VzIHRhYmxlIHNob3dpbmcgY291bnRzLg=="><div class="gt_from_md"><p style="margin: 0; padding: 0; margin-top: 0; margin-bottom: 0;">Table lists indiviual records for animals sampled to have multiple infections.  Detailed version of previous table showing counts.</p>
-</div></div></caption>
+  <caption><span data-qmd-base64="VGFibGUgbGlzdHMgaW5kaXZpdWFsIHJlY29yZHMgZm9yIGFuaW1hbHMgc2FtcGxlZCB0byBoYXZlIG11bHRpcGxlIGluZmVjdGlvbnMuICBEZXRhaWxlZCB2ZXJzaW9uIG9mIHByZXZpb3VzIHRhYmxlIHNob3dpbmcgY291bnRzLg=="><span class="gt_from_md">Table lists indiviual records for animals sampled to have multiple infections.  Detailed version of previous table showing counts.</span></span></caption>
   <colgroup>
     <col style="width:250px;">
     <col style="width:90px;">
@@ -594,8 +603,7 @@ pre {
   </colgroup>
   <thead style="border-style: none;">
     <tr class="gt_heading" style="border-style: none; background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3;" bgcolor="#FFFFFF" align="center">
-      <td colspan="7" class="gt_heading gt_title gt_font_normal gt_bottom_border" style="border-style: none; color: #333333; font-size: large; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; background-color: #FFFFFF; text-align: center; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; font-weight: normal;" bgcolor="#FFFFFF" align="center"><div data-qmd-base64="U3ViY2xpbmljYWwgd2l0aCBNdWx0aXBsZSBJbmZlY3Rpb25z"><div class="gt_from_md"><p style="margin: 0; padding: 0; margin-top: 0; margin-bottom: 0;">Subclinical with Multiple Infections</p>
-</div></div></td>
+      <td colspan="7" class="gt_heading gt_title gt_font_normal gt_bottom_border" style="border-style: none; color: #333333; font-size: large; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; background-color: #FFFFFF; text-align: center; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; font-weight: normal;" bgcolor="#FFFFFF" align="center"><span data-qmd-base64="U3ViY2xpbmljYWwgd2l0aCBNdWx0aXBsZSBJbmZlY3Rpb25z"><span class="gt_from_md">Subclinical with Multiple Infections</span></span></td>
     </tr>
     
     <tr class="gt_col_headings" style="border-style: none; border-top-style: solid; border-top-width: 2px; border-top-color: #5F5F5F; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #5F5F5F; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3;">
@@ -932,65 +940,65 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sero_df_red <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status <span class="sc">==</span> <span class="st">"Subclinical"</span>)  <span class="sc">%&gt;%</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal_farm =</span> <span class="fu">paste</span>(farm_code, animal, <span class="at">sep =</span> <span class="st">": "</span>))</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>sero_df_red <span class="ot">&lt;-</span> sero_df_red <span class="sc">%&gt;%</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(farm_code), animal) <span class="sc">%&gt;%</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal_farm =</span> <span class="fu">factor</span>(animal_farm, <span class="at">levels =</span> <span class="fu">unique</span>(animal_farm)))</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>background <span class="ot">&lt;-</span> sero_df_red <span class="sc">%&gt;%</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(farm_code) <span class="sc">%&gt;%</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">ymin =</span> <span class="fu">min</span>(<span class="fu">which</span>(<span class="fu">levels</span>(animal_farm) <span class="sc">%in%</span> animal_farm)) <span class="sc">-</span> <span class="fl">0.5</span>,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">ymax =</span> <span class="fu">max</span>(<span class="fu">which</span>(<span class="fu">levels</span>(animal_farm) <span class="sc">%in%</span> animal_farm)) <span class="sc">+</span> <span class="fl">0.5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>palette_colors <span class="ot">&lt;-</span> pals<span class="sc">::</span><span class="fu">watlington</span>(<span class="fu">length</span>(<span class="fu">unique</span>(sero_df_red<span class="sc">$</span>farm_code)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sero_df_red <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status <span class="sc">==</span> <span class="st">"Subclinical"</span>)  <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal_farm =</span> <span class="fu">paste</span>(farm_code, animal, <span class="at">sep =</span> <span class="st">": "</span>))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>sero_df_red <span class="ot">&lt;-</span> sero_df_red <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(farm_code), animal) <span class="sc">%&gt;%</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal_farm =</span> <span class="fu">factor</span>(animal_farm, <span class="at">levels =</span> <span class="fu">unique</span>(animal_farm)))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>background <span class="ot">&lt;-</span> sero_df_red <span class="sc">%&gt;%</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(farm_code) <span class="sc">%&gt;%</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">ymin =</span> <span class="fu">min</span>(<span class="fu">which</span>(<span class="fu">levels</span>(animal_farm) <span class="sc">%in%</span> animal_farm)) <span class="sc">-</span> <span class="fl">0.5</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">ymax =</span> <span class="fu">max</span>(<span class="fu">which</span>(<span class="fu">levels</span>(animal_farm) <span class="sc">%in%</span> animal_farm)) <span class="sc">+</span> <span class="fl">0.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>palette_colors <span class="ot">&lt;-</span> pals<span class="sc">::</span><span class="fu">watlington</span>(<span class="fu">length</span>(<span class="fu">unique</span>(sero_df_red<span class="sc">$</span>farm_code)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(<span class="at">data =</span> background, <span class="fu">aes</span>(<span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2011-11-30"</span>), </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2012-12-31"</span>), </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax, </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">fill =</span> farm_code), <span class="at">col=</span><span class="st">"transparent"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> sero_df_red, <span class="fu">aes</span>(<span class="at">x =</span> samp_date, <span class="at">y =</span> animal_farm, </span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">color =</span> serotype, <span class="at">shape =</span> serotype), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> </span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">" "</span>,</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">" "</span>,</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Animal"</span>,</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Serotype"</span>,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Serotype"</span>,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Farm"</span>) <span class="sc">+</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>),</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">shape =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>),</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">gsub</span>(<span class="st">".*: "</span>, <span class="st">""</span>, x)) <span class="sc">+</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> palette_colors) <span class="sc">+</span> </span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.margin =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>),<span class="st">"cm"</span>),</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.major =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> <span class="fl">0.15</span>),</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> <span class="fl">0.05</span>),</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.direction =</span> <span class="st">"horizontal"</span>,</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position=</span><span class="st">"bottom"</span>,</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">16</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">strip.background =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.key.size =</span> <span class="fu">unit</span>(<span class="dv">2</span>,<span class="st">"line"</span>),</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="dv">3</span>,<span class="st">"line"</span>),</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">16</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">18</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">18</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">22</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">face=</span><span class="st">"bold"</span>, <span class="at">size=</span><span class="dv">15</span>, <span class="at">vjust=</span><span class="fl">0.5</span>, </span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust=</span><span class="fl">0.5</span>, <span class="at">angle=</span><span class="dv">0</span>),</span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">10</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">10</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.spacing =</span> <span class="fu">unit</span>(<span class="dv">4</span>, <span class="st">"cm"</span>), </span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.margin =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">2</span>, <span class="at">b =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(<span class="at">data =</span> background, <span class="fu">aes</span>(<span class="at">xmin =</span> <span class="fu">as.Date</span>(<span class="st">"2011-11-30"</span>), </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">xmax =</span> <span class="fu">as.Date</span>(<span class="st">"2012-12-31"</span>), </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax, </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">fill =</span> farm_code), <span class="at">col=</span><span class="st">"transparent"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> sero_df_red, <span class="fu">aes</span>(<span class="at">x =</span> samp_date, <span class="at">y =</span> animal_farm, </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">color =</span> serotype, <span class="at">shape =</span> serotype), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">" "</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">" "</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Animal"</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Serotype"</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Serotype"</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Farm"</span>) <span class="sc">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>   <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">shape =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">1</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">3</span>, <span class="at">title.position =</span> <span class="st">"top"</span>, <span class="at">title.hjust =</span> <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">gsub</span>(<span class="st">".*: "</span>, <span class="st">""</span>, x)) <span class="sc">+</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> palette_colors) <span class="sc">+</span> </span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.margin =</span> <span class="fu">unit</span>(<span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>),<span class="st">"cm"</span>),</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.major =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> <span class="fl">0.15</span>),</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.grid.minor =</span> <span class="fu">element_line</span>(<span class="at">linewidth =</span> <span class="fl">0.05</span>),</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.direction =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position=</span><span class="st">"bottom"</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">16</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        <span class="at">strip.background =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.key.size =</span> <span class="fu">unit</span>(<span class="dv">2</span>,<span class="st">"line"</span>),</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.key.width =</span> <span class="fu">unit</span>(<span class="dv">3</span>,<span class="st">"line"</span>),</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">16</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">18</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">18</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">22</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">face=</span><span class="st">"bold"</span>, <span class="at">size=</span><span class="dv">15</span>, <span class="at">vjust=</span><span class="fl">0.5</span>, </span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust=</span><span class="fl">0.5</span>, <span class="at">angle=</span><span class="dv">0</span>),</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">10</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">10</span>, <span class="at">face=</span><span class="st">"bold"</span>),</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.spacing =</span> <span class="fu">unit</span>(<span class="dv">4</span>, <span class="st">"cm"</span>), </span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.margin =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">2</span>, <span class="at">b =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-coinfect" class="quarto-figure quarto-figure-center anchored">
@@ -1000,6 +1008,9 @@ pre {
 </figure>
 </div>
 </div>
+</div>
+<div class="cell">
+
 </div>
 </section>
 </section>
@@ -1011,23 +1022,23 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>iso_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"A/PAK/KCH/7/2009"</span>, <span class="st">"A/PAK/ICT/1/2008"</span>, <span class="st">"A/PAK/ICT/276/2012"</span>, </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"A/PAK/SGD/12/2012"</span>, <span class="st">"A/PAK/PSH/34/2012"</span>, <span class="st">"A/PAK/FSD/4/2012"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>isolate_dates <span class="ot">&lt;-</span> <span class="fu">get_isolate_collection_date</span>(iso_names) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>iso_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"A/PAK/KCH/7/2009"</span>, <span class="st">"A/PAK/ICT/1/2008"</span>, <span class="st">"A/PAK/ICT/276/2012"</span>, </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"A/PAK/SGD/12/2012"</span>, <span class="st">"A/PAK/PSH/34/2012"</span>, <span class="st">"A/PAK/FSD/4/2012"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>isolate_dates <span class="ot">&lt;-</span> <span class="fu">get_isolate_collection_date</span>(iso_names) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: rentrez</code></pre>
 </div>
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>isolate_dates <span class="sc">%&gt;%</span> <span class="co"># only years available...  The middle June 1 will be used for month and day</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>isolate_dates <span class="sc">%&gt;%</span> <span class="co"># only years available...  The middle June 1 will be used for month and day</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 
 <div style="all:initial" ;="">
-<div id="bhhebfygda" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tudhwsaxaz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false" style="-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3;" bgcolor="#FFFFFF">
   <thead style="border-style: none;">
@@ -1058,18 +1069,18 @@ pre {
 </div>
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>acc_numbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"KF112900"</span>, <span class="st">"JF721440"</span>, <span class="st">"MT981310"</span>, <span class="st">"MF140445"</span>, <span class="st">"JN006719"</span>, </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"KM268898"</span>, <span class="st">"JX170756"</span>, <span class="st">"MT944981"</span>, <span class="st">"KR149704"</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>access_meta <span class="ot">&lt;-</span> <span class="fu">get_accession_date_meta</span>(acc_numbers) <span class="co"># only year for some...</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>access_meta <span class="sc">%&gt;%</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>acc_numbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"KF112900"</span>, <span class="st">"JF721440"</span>, <span class="st">"MT981310"</span>, <span class="st">"MF140445"</span>, <span class="st">"JN006719"</span>, </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"KM268898"</span>, <span class="st">"JX170756"</span>, <span class="st">"MT944981"</span>, <span class="st">"KR149704"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>access_meta <span class="ot">&lt;-</span> <span class="fu">get_accession_date_meta</span>(acc_numbers) <span class="co"># only year for some...</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>access_meta <span class="sc">%&gt;%</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 
 <div style="all:initial" ;="">
-<div id="csigcvqxap" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="chkqmwscgu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false" style="-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3;" bgcolor="#FFFFFF">
   <thead style="border-style: none;">
@@ -1133,38 +1144,38 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>tree_tmp <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">6</span>]))</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> tree_tmp<span class="sc">$</span>tip.label</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>dates_file <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(label, samp_date)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>dates_file <span class="ot">&lt;-</span> <span class="fu">left_join</span>(tree_tips, dates_file, <span class="at">by=</span><span class="st">"label"</span>) </span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>dates_file <span class="ot">&lt;-</span> dates_file <span class="sc">%&gt;%</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">samp_date =</span> <span class="fu">case_when</span>(</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"KF112900"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2009-01-14"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"JF721440"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2009-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"MT981310"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/KCH/7/2009"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2009-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/ICT/1/2008"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2008-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/ICT/276/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/SGD/12/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/PSH/34/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/FSD/4/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> samp_date </span>
-<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(dates_file, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"local/beast/a_1/fmd_a_dates.tsv"</span>), </span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tree_tmp <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">6</span>]))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> tree_tmp<span class="sc">$</span>tip.label</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>dates_file <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(label, samp_date)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>dates_file <span class="ot">&lt;-</span> <span class="fu">left_join</span>(tree_tips, dates_file, <span class="at">by=</span><span class="st">"label"</span>) </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>dates_file <span class="ot">&lt;-</span> dates_file <span class="sc">%&gt;%</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">samp_date =</span> <span class="fu">case_when</span>(</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"KF112900"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2009-01-14"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"JF721440"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2009-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"MT981310"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/KCH/7/2009"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2009-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/ICT/1/2008"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2008-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/ICT/276/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/SGD/12/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/PSH/34/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"A/PAK/FSD/4/2012"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2012-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> samp_date </span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(dates_file, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"local/beast/a_1/fmd_a_dates.tsv"</span>), </span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>
@@ -1173,71 +1184,7 @@ pre {
 <div class="cell">
 <details open="">
 <summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tree_tmp <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">7</span>]))</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> tree_tmp<span class="sc">$</span>tip.label</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips  <span class="sc">%&gt;%</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parts =</span> <span class="fu">str_split</span>(label, <span class="st">"/"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">string =</span> <span class="fu">sapply</span>(parts, <span class="cf">function</span>(x) <span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">3</span>) x[<span class="dv">4</span>] <span class="cf">else</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal =</span> <span class="fu">as.integer</span>(</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), string))) <span class="sc">%&gt;%</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">2</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="cn">NA_character_</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>parts)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>dates_lu <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> samp_date) <span class="sc">%&gt;%</span></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(label, date) </span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">left_join</span>(tree_tips, dates_lu, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"label"</span>))</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>is_year <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(x, <span class="cf">function</span>(y) {</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">"^[0-9]{4}$"</span>, y)) {</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>      year <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(y)</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(year <span class="sc">&gt;=</span> <span class="dv">1950</span> <span class="sc">&amp;&amp;</span> year <span class="sc">&lt;=</span> <span class="dv">2015</span>)</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">FALSE</span>)</span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">label_year =</span> <span class="fu">substr</span>(label, <span class="fu">nchar</span>(label)<span class="sc">-</span><span class="dv">3</span>, <span class="fu">nchar</span>(label)),</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_year =</span> <span class="fu">is_year</span>(label_year),</span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>      is_year <span class="sc">==</span> <span class="cn">TRUE</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(date), </span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.Date</span>(<span class="fu">paste</span>(label_year, <span class="st">"06"</span>, <span class="st">"01"</span>, <span class="at">sep=</span><span class="st">"-"</span>)),</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>      date</span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">as.Date</span>(date, <span class="at">origin=</span><span class="st">"1970-01-01"</span>)</span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(string, animal, sample, label_year, is_year))</span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">case_when</span>(</span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"MF140445"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2017-03-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"JN006719"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2008-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"KM268898"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2013-02-09"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> date </span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(tree_tips, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"local/beast/asia1_1/fmd_asia1_dates.tsv"</span>), </span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</div>
-<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<p>Creating dates table for Beast.</p>
-<div class="cell">
-<details open="">
-<summary>Hide code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tree_tmp <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">9</span>]))</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tree_tmp <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">7</span>]))</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(</span>
@@ -1253,32 +1200,96 @@ pre {
 <span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">2</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="cn">NA_character_</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>parts)</span>
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">left_join</span>(tree_tips, dates_lu, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"label"</span>))</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">label_year =</span> <span class="fu">substr</span>(label, <span class="fu">nchar</span>(label)<span class="sc">-</span><span class="dv">3</span>, <span class="fu">nchar</span>(label)),</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_year =</span> <span class="fu">is_year</span>(label_year),</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>      is_year <span class="sc">==</span> <span class="cn">TRUE</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(date), </span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.Date</span>(<span class="fu">paste</span>(label_year, <span class="st">"06"</span>, <span class="st">"01"</span>, <span class="at">sep=</span><span class="st">"-"</span>)),</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>      date</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">as.Date</span>(date, <span class="at">origin=</span><span class="st">"1970-01-01"</span>)</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(string, animal, sample, label_year, is_year))</span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">case_when</span>(</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"JX170756"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2011-02-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"MT944981"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2016-02-14"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"KR149704"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2010-01-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> date</span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(tree_tips, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"local/beast/o_1/fmd_0_dates.tsv"</span>), </span>
-<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>dates_lu <span class="ot">&lt;-</span> sero_df <span class="sc">%&gt;%</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> samp_date) <span class="sc">%&gt;%</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(label, date) </span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">left_join</span>(tree_tips, dates_lu, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"label"</span>))</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>is_year <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(x, <span class="cf">function</span>(y) {</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">"^[0-9]{4}$"</span>, y)) {</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>      year <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(y)</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(year <span class="sc">&gt;=</span> <span class="dv">1950</span> <span class="sc">&amp;&amp;</span> year <span class="sc">&lt;=</span> <span class="dv">2015</span>)</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="cn">FALSE</span>)</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">label_year =</span> <span class="fu">substr</span>(label, <span class="fu">nchar</span>(label)<span class="sc">-</span><span class="dv">3</span>, <span class="fu">nchar</span>(label)),</span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_year =</span> <span class="fu">is_year</span>(label_year),</span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>      is_year <span class="sc">==</span> <span class="cn">TRUE</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(date), </span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.Date</span>(<span class="fu">paste</span>(label_year, <span class="st">"06"</span>, <span class="st">"01"</span>, <span class="at">sep=</span><span class="st">"-"</span>)),</span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>      date</span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">as.Date</span>(date, <span class="at">origin=</span><span class="st">"1970-01-01"</span>)</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(string, animal, sample, label_year, is_year))</span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">case_when</span>(</span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"MF140445"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2017-03-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"JN006719"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2008-06-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"KM268898"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2013-02-09"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> date </span>
+<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(tree_tips, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"local/beast/asia1_1/fmd_asia1_dates.tsv"</span>), </span>
+<span id="cb22-56"><a href="#cb22-56" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Creating dates table for Beast.</p>
+<div class="cell">
+<details open="">
+<summary>Hide code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>tree_tmp <span class="ot">&lt;-</span> <span class="fu">read.nexus</span>(<span class="fu">here</span>(<span class="st">"local/paktrees"</span>, tree_files[<span class="dv">9</span>]))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> tree_tmp<span class="sc">$</span>tip.label</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips  <span class="sc">%&gt;%</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">parts =</span> <span class="fu">str_split</span>(label, <span class="st">"/"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">string =</span> <span class="fu">sapply</span>(parts, <span class="cf">function</span>(x) <span class="cf">if</span> (<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">3</span>) x[<span class="dv">4</span>] <span class="cf">else</span> <span class="cn">NA</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">animal =</span> <span class="fu">as.integer</span>(</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), string))) <span class="sc">%&gt;%</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(string, <span class="st">"-"</span>), <span class="fu">word</span>(string, <span class="dv">2</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="cn">NA_character_</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>parts)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> <span class="fu">left_join</span>(tree_tips, dates_lu, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"label"</span>))</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">label_year =</span> <span class="fu">substr</span>(label, <span class="fu">nchar</span>(label)<span class="sc">-</span><span class="dv">3</span>, <span class="fu">nchar</span>(label)),</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_year =</span> <span class="fu">is_year</span>(label_year),</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>      is_year <span class="sc">==</span> <span class="cn">TRUE</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(date), </span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.Date</span>(<span class="fu">paste</span>(label_year, <span class="st">"06"</span>, <span class="st">"01"</span>, <span class="at">sep=</span><span class="st">"-"</span>)),</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>      date</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">as.Date</span>(date, <span class="at">origin=</span><span class="st">"1970-01-01"</span>)</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(string, animal, sample, label_year, is_year))</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>tree_tips <span class="ot">&lt;-</span> tree_tips <span class="sc">%&gt;%</span></span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">case_when</span>(</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"JX170756"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2011-02-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"MT944981"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2016-02-14"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>    label <span class="sc">==</span> <span class="st">"KR149704"</span> <span class="sc">~</span> <span class="fu">as_date</span>(<span class="st">"2010-01-01"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>),</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> date</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="fu">write.table</span>(tree_tips, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">"local/beast/o_1/fmd_0_dates.tsv"</span>), </span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">col.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </div>

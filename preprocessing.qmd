@@ -113,6 +113,11 @@ farms_locs <- farm_file %>%
   ungroup() %>%
   as.data.frame()
 ```
+```{r eval=FALSE}
+write.csv(farms_locs, here("local/farms_locs.csv"), row.names = FALSE)
+write.csv(farm_file, here("local/animals_locs.csv"), row.names = FALSE)
+
+```
   
 ### Format data for mapping  
 The function *calculate_bounding_box()* helps with conversion and padding dtermination for the map.
@@ -208,6 +213,7 @@ sub_only$serotype <- sub("/.*", "", sub_only$label)
 save a copy
 ```{r eval=FALSE}
 saveRDS(sero_df, here("local/assets/sero_df.rds"))
+write.csv(farms_locs, here("local/farms_locs.csv"), row.names = FALSE)
 ```
   
 ### Co-Infected Animals  
@@ -291,6 +297,7 @@ palette_colors <- pals::watlington(length(unique(sero_df_red$farm_code)))
 #| label: fig-coinfect
 #| fig-cap: "Figure summarizes the serotypes and timiming of FMDV sampled from animals listed along vertical axis.  More than one point on a line indicates multiple infections were detected."
 #|  
+
 ggplot() +
   geom_rect(data = background, aes(xmin = as.Date("2011-11-30"), 
                                    xmax = as.Date("2012-12-31"), 
@@ -331,7 +338,44 @@ ggplot() +
         legend.spacing = unit(4, "cm"), 
         legend.margin = margin(t = 2, b = 1))
 ```
-  
+
+```{r eval=FALSE, echo=FALSE}
+sero_df_red <- sero_df_red %>%
+  mutate(samp_date = factor(samp_date, 
+                            levels = unique(samp_date[order(as.Date(samp_date))]))) %>%
+  mutate(animal_farm = fct_reorder(animal_farm, desc(animal)))
+
+
+ggplot() +
+  geom_point(data = sero_df_red, aes(x = samp_date, y = animal_farm, 
+                                     color = serotype, shape = serotype), size = 3) +
+  scale_x_discrete(labels = function(x) format(as.Date(x), "%b %d")) + 
+  theme_minimal() +
+  labs(title = " ",
+       x = " ",
+       y = "Farm: Animal",
+       color = "Serotype",
+       shape = "Serotype") +
+  theme(
+    axis.text.x = element_text(face = "bold", size = 12, angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 10, face = "bold"),
+    axis.title.y = element_text(size = 22, face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray80", linetype = "dotted", linewidth = 0.15),
+    legend.direction = "horizontal",
+    legend.position = "bottom",
+    legend.key.size = unit(2, "line"),
+    legend.key.width = unit(3, "line"),
+    legend.text = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 18, face = "bold"),
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
+  ) +
+  guides(
+    color = guide_legend(ncol = 2),
+    shape = guide_legend(ncol = 2)
+  )
+```  
+
 ## Tree Dates  
 The (ugly) code below used to create date files for serotype-specific time calibrated trees in Beast.  Dates for clinical samples used as outgroups are queried at GenBank using the custom functions *get_isolate_collection_date()* and *get_accession_date_meta()* that search the samples metadata for date related information.  The **rentrez** package is used for metadata retrieval.  
    
