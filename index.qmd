@@ -36,7 +36,7 @@ pre {
 ::: {.callout-important icon=true}
 #### Under Active Development    
 
-The tabs across the top of this webpage can be navigated to view various exploratory analyses examining FMDV co-infection and recombination dynamics in water buffalo.  The code, data, and analyses on this site have not been verified or validated and are subject to change.  
+The tabs across the top of this webpage can be navigated to view various exploratory analyses examining FMDV co-infection and recombination dynamics in water buffalo.The code, data, and analyses on this site have not been verified or validated and are subject to change.  
   
 ::: 
   
