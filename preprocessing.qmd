@@ -72,11 +72,11 @@ source_dir(here("R"))
 ## Revise Nexus Files  
 The function *nexus_label_swap()* edits the Nexus file to move the descriptive text with each sample to the label position to be shown as tip labels.  The revised file is saved with a `_rev` added to the end.    
 ```{r eval=FALSE}
-tree_files <- list.files(here("local/paktrees"))
+tree_files <- list.files(here("local/paktrees/original"))
 
 # swap labels
 for(i in 1:length(tree_files)){
-  nexus_label_swap(here("local/paktrees", tree_files[i]))
+  nexus_label_swap(here("local/paktrees/original/", tree_files[i]))
 }
 
 ```
@@ -85,10 +85,10 @@ for(i in 1:length(tree_files)){
 Tree visualization to confirm *nexus_label_swap()* worked
 ```{r fig.height=18, fig.width=8}
 # list of revised nexus files
-tree_files <- list.files(here("local/paktrees"), pattern="_rev\\.nex$")
+tree_files <- list.files(here("local/paktrees/original"), pattern="_rev\\.nex$")
 
 # choose a tree
-tree_tmp <- read.nexus(here("local/paktrees", tree_files[4]))
+tree_tmp <- read.nexus(here("local/paktrees/original", tree_files[4]))
 ```
 ```{r fig.height=18, fig.width=8}
 #| label: fig-treeview
@@ -101,21 +101,30 @@ plot_tree_serotype(tree_tmp)
 ## Geography  
 Extract, clean, and join geographic coordinates.  The function *convert_dms_to_dd()* was coded to clean special characters and mistyped text from the raw file before conversion.  
 ```{r fig.width=8, fig.height=8, warning=FALSE, message=FALSE}
-farm_file <- read.csv(here("local/farm_clean2.csv"))
+
+farm_file <- read.csv(here("local/farm_clean2.csv")) %>%
+   mutate(farm_code = if_else(animal >= 146 & animal <= 155, "DD",  farm_code))
 
 farm_file  <- farm_file %>%
   mutate(coord_x = as.numeric(sapply(coord_x, convert_dms_to_dd)),
          coord_y = as.numeric(sapply(coord_y, convert_dms_to_dd)))
 
-farms_locs <- farm_file %>%
+farms_locs <- farm_file %>% # unique locations
   group_by(farm_code) %>%
   slice(1) %>%
   ungroup() %>%
   as.data.frame()
+
+# Faroog et al, 2018 states 136-145 are farm code N & 146-155 are DD.
+# However, data (Pakistan FARM LIST DATA- BArbarita.xls) has N and DD lumped as same farm, Tarlai.
+# coordinates for N and DD are different.  Likely same owner, different locations.
+# splitting them here consistent with Farooq et al.
+animal_locs <- farm_file %>%
+  distinct(animal, farm_code) 
 ```
 ```{r eval=FALSE}
 write.csv(farms_locs, here("local/farms_locs.csv"), row.names = FALSE)
-write.csv(farm_file, here("local/animals_locs.csv"), row.names = FALSE)
+write.csv(animal_locs, here("local/animals_locs.csv"), row.names = FALSE)
 
 ```
   
@@ -154,7 +163,7 @@ plot_study_area(new_background, farms_locs)
 ## Subclinical Summary 
 Data wrangling to summarize subclinical cases.  The *convert_dates()* function is used to standardize dates recorded using different formats.  
 ```{r}
-all_serotypes_tree <- read.nexus(here("local/paktrees", tree_files[5]))
+all_serotypes_tree <- read.nexus(here("local/paktrees/original", tree_files[5]))
 
 sero_df <- as.data.frame(
   all_serotypes_tree$tip.label
@@ -190,12 +199,12 @@ samp_date_table <- farm_file %>%
 sero_df <- left_join(sero_df, samp_date_table, by = c("animal", "sample"))
 sero_df$samp_date <- as.Date(sero_df$samp_date)
 
-farm_file$farm_code <- with(farms_locs,
-                            farm_code[match(
-                              farm_file$farm_name,
-                              farm_name)])
+#farm_file$farm_code <- with(farms_locs, ###########
+#                            farm_code[match(
+#                              farm_file$farm_name,
+#                              farm_name)])
 
-sero_df$farm_code <- with(farm_file,
+sero_df$farm_code <- with(animal_locs,
                           farm_code[match(
                              sero_df$animal,
                              animal)])
@@ -214,6 +223,7 @@ save a copy
 ```{r eval=FALSE}
 saveRDS(sero_df, here("local/assets/sero_df.rds"))
 write.csv(farms_locs, here("local/farms_locs.csv"), row.names = FALSE)
+write.csv(animal_locs, here("local/animal_locs.csv"), row.names = FALSE)
 ```
   
 ### Co-Infected Animals  
@@ -291,7 +301,7 @@ background <- sero_df_red %>%
             ymax = max(which(levels(animal_farm) %in% animal_farm)) + 0.5) %>%
   ungroup()
 
-palette_colors <- pals::watlington(length(unique(sero_df_red$farm_code)))
+palette_colors <- pals::glasbey(length(unique(sero_df_red$farm_code)))
 ```
 ```{r fig.width=9, fig.height=10, collapse=TRUE}
 #| label: fig-coinfect
@@ -339,13 +349,22 @@ ggplot() +
         legend.margin = margin(t = 2, b = 1))
 ```
 
-```{r eval=FALSE, echo=FALSE}
+#### Clades
+Simplify and add clades from Farooq, et al. 2018.
+```{r}
+clades_farooq <- read.csv(here("local/clades_farooq.csv")) %>%
+  mutate(Clade = paste0(serotype, " (", clade, ")")) %>%
+  select(animal, sample, farm_code, Clade)
+
 sero_df_red <- sero_df_red %>%
-  mutate(samp_date = factor(samp_date, 
-                            levels = unique(samp_date[order(as.Date(samp_date))]))) %>%
-  mutate(animal_farm = fct_reorder(animal_farm, desc(animal)))
+  mutate(sample = as.integer(sample))
+
+sero_df_red <- left_join(sero_df_red, clades_farooq, by = c("animal", "sample", "farm_code")) %>%
+  mutate(Clade = if_else(is.na(Clade), serotype, Clade))
 
 
+```
+```{r eval=FALSE, echo=FALSE}
 ggplot() +
   geom_point(data = sero_df_red, aes(x = samp_date, y = animal_farm, 
                                      color = serotype, shape = serotype), size = 3) +
@@ -376,6 +395,56 @@ ggplot() +
   )
 ```  
 
+```{r fig.width=9, fig.height=10, collapse=TRUE}
+sero_df_red <- sero_df_red %>%
+  mutate(samp_date = factor(samp_date, 
+                            levels = unique(samp_date[order(as.Date(samp_date))]))) %>%
+  mutate(animal_farm = fct_reorder(animal_farm, desc(animal)))
+
+clade_colors <- setNames(
+  tol(n = length(unique(na.omit(sero_df_red$Clade)))),
+  unique(na.omit(sero_df_red$Clade))
+)
+
+# no clade designation
+clade_colors <- c(clade_colors, "NA" = "black")
+
+ggplot() +
+  geom_point(data = sero_df_red, 
+             aes(x = samp_date, y = animal_farm, 
+                 color = Clade, shape = serotype), 
+             size = 3.5) +
+  scale_color_manual(
+    values = clade_colors,
+    na.value = "black",
+    breaks = names(clade_colors)[names(clade_colors) != "NA"] 
+  ) +
+  scale_x_discrete(labels = function(x) format(as.Date(x), "%b %d")) + 
+  theme_minimal() +
+  labs(title = " ",
+       x = " ",
+       y = "Farm: Animal",
+       color = "Clade",
+       shape = "Serotype") +
+  theme(
+    axis.text.x = element_text(face = "bold", size = 12, angle = 45, hjust = 1),
+    axis.text.y = element_text(size = 10, face = "bold"),
+    axis.title.y = element_text(size = 22, face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray80", linetype = "dotted", linewidth = 0.15),
+    legend.direction = "horizontal",
+    legend.position = "bottom",
+    legend.key.size = unit(2, "line"),
+    legend.key.width = unit(3, "line"),
+    legend.text = element_text(size = 16, face = "bold"),
+    legend.title = element_text(size = 18, face = "bold"),
+    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
+  ) +
+  guides(
+    color = guide_legend(ncol = 3),
+    shape = guide_legend(ncol = 3)
+  )
+```
 ## Tree Dates  
 The (ugly) code below used to create date files for serotype-specific time calibrated trees in Beast.  Dates for clinical samples used as outgroups are queried at GenBank using the custom functions *get_isolate_collection_date()* and *get_accession_date_meta()* that search the samples metadata for date related information.  The **rentrez** package is used for metadata retrieval.  
    

@@ -68,26 +68,26 @@ source_dir(here("R"))
 Segment specific phylogenies.  Note that the`_rev` subfix indicates that the original Nexus files were revised to swap tip labels for names in the description block (see, preprocessing)  
 ```{r}
 # phylogeny list from directory
-tree_files <- list.files(here("local/paktrees"), pattern="_rev\\.nex$")
+tree_files <- list.files(here("local/paktrees/original"), pattern="_rev\\.nex$")
 
 # read ML trees & convert
-IRES_Lpro.tree <- read.nexus(here("local/paktrees", tree_files[8]))
+IRES_Lpro.tree <- read.nexus(here("local/paktrees/original", tree_files[8]))
 IRES_Lpro.den <- get_dendro(
   extract_subtree(IRES_Lpro.tree))
 
-seg_2C.tree <- read.nexus(here("local/paktrees", tree_files[1]))
+seg_2C.tree <- read.nexus(here("local/paktrees/original", tree_files[1]))
 seg_2C.den <- get_dendro(
   extract_subtree(seg_2C.tree))
 
-seg_3A.tree <- read.nexus(here("local/paktrees", tree_files[2]))
+seg_3A.tree <- read.nexus(here("local/paktrees/original", tree_files[2]))
 seg_3A.den <- get_dendro(
   extract_subtree(seg_3A.tree))
 
-seg_3C.tree <- read.nexus(here("local/paktrees", tree_files[3]))
+seg_3C.tree <- read.nexus(here("local/paktrees/original", tree_files[3]))
 seg_3C.den <- get_dendro(
   extract_subtree(seg_3C.tree))
 
-seg_3D.tree <- read.nexus(here("local/paktrees", tree_files[4]))
+seg_3D.tree <- read.nexus(here("local/paktrees/original", tree_files[4]))
 seg_3D.den <- get_dendro(
   extract_subtree(seg_3D.tree))
 ```
@@ -467,16 +467,16 @@ ggplot(mat_view, aes(Var1, Var2, fill = Score)) +
     plot.margin = unit(c(2, 8, 5, 8), "mm"),
     axis.title.x = element_text(size = 24, face = "bold"),
     axis.title.y = element_text(size = 24, face = "bold"),
-    axis.text.x = element_text(size = 12, face = "bold"),
-    axis.text.y = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(size = 20, face = "bold"),
+    axis.text.y = element_text(size = 20, face = "bold"),
     legend.direction = "vertical",
     legend.position = "right",
     strip.text = element_blank(), 
     strip.background = element_blank(),
     legend.key.size = unit(2, "line"),
     legend.key.width = unit(1, "line"),
-    legend.text = element_text(size = 16, face = "bold"),
-    legend.title = element_text(size = 16, face = "bold"),
+    legend.text = element_text(size = 20, face = "bold"),
+    legend.title = element_text(size = 25, face = "bold"),
     plot.title = element_text(size = 28, face = "bold")
   ) +
   labs(title = "Entanglement Scores",
