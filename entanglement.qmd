@@ -461,14 +461,16 @@ mat_view$Var2 <- gsub("_", " ", mat_view$Var2)
 
 ggplot(mat_view, aes(Var1, Var2, fill = Score)) +
   geom_tile() +
-  scale_fill_viridis_c(option = "D") +
+   scale_fill_gradientn(
+    colors = (pals::ocean.ice(100)[20:100]) 
+  ) +
   theme_classic() +
   theme(
-    plot.margin = unit(c(2, 8, 5, 8), "mm"),
+    plot.margin = unit(c(2, 2, 2, 2), "mm"),
     axis.title.x = element_text(size = 24, face = "bold"),
     axis.title.y = element_text(size = 24, face = "bold"),
-    axis.text.x = element_text(size = 20, face = "bold"),
-    axis.text.y = element_text(size = 20, face = "bold"),
+    axis.text.x = element_text(size = 23, face = "bold"),
+    axis.text.y = element_text(size = 23, face = "bold"),
     legend.direction = "vertical",
     legend.position = "right",
     strip.text = element_blank(), 
@@ -477,8 +479,8 @@ ggplot(mat_view, aes(Var1, Var2, fill = Score)) +
     legend.key.width = unit(1, "line"),
     legend.text = element_text(size = 20, face = "bold"),
     legend.title = element_text(size = 25, face = "bold"),
-    plot.title = element_text(size = 28, face = "bold")
-  ) +
+    plot.title = element_text(size = 28, face = "bold") 
+    ) +
   labs(title = "Entanglement Scores",
        x = " ", y = " ", fill = "Entanglement")
 ```

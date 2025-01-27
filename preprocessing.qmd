@@ -360,7 +360,9 @@ sero_df_red <- sero_df_red %>%
   mutate(sample = as.integer(sample))
 
 sero_df_red <- left_join(sero_df_red, clades_farooq, by = c("animal", "sample", "farm_code")) %>%
-  mutate(Clade = if_else(is.na(Clade), serotype, Clade))
+  mutate(Clade = if_else(is.na(Clade) & serotype == "A", "A (C1)", Clade),
+         Clade = if_else(is.na(Clade) & serotype == "Asia1", "Asia1 (C1)", Clade),
+         Clade = if_else(is.na(Clade), serotype, Clade))
 
 
 ```
@@ -401,10 +403,20 @@ sero_df_red <- sero_df_red %>%
                             levels = unique(samp_date[order(as.Date(samp_date))]))) %>%
   mutate(animal_farm = fct_reorder(animal_farm, desc(animal)))
 
-clade_colors <- setNames(
-  tol(n = length(unique(na.omit(sero_df_red$Clade)))),
-  unique(na.omit(sero_df_red$Clade))
+A_col <- rev(brewer.reds(4))[1:3]
+Asia1_col <- rev(brewer.blues(5))[1:4]
+
+clade_colors <- c(
+  "Asia1 (C1)" = Asia1_col[4],
+  "Asia1 (C2)" = Asia1_col[3],
+  "Asia1 (C4)" = Asia1_col[1],
+  "A (C1)"     = A_col[3],
+  "O"          = "gray40",
+  "A (C2)"     = A_col[2],
+  "Asia1 (C3)" = Asia1_col[2],
+  "A (C3)"     = A_col[1]
 )
+
 
 # no clade designation
 clade_colors <- c(clade_colors, "NA" = "black")
@@ -438,7 +450,7 @@ ggplot() +
     legend.key.width = unit(3, "line"),
     legend.text = element_text(size = 16, face = "bold"),
     legend.title = element_text(size = 18, face = "bold"),
-    plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
+    plot.margin = unit(c(0.01, 0.5, 0.01, 0.5), "cm")
   ) +
   guides(
     color = guide_legend(ncol = 3),

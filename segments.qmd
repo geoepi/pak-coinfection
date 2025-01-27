@@ -138,11 +138,11 @@ rf_df$Var2 <- gsub("_", " ", rf_df$Var2)
 ggplot(rf_df, aes(Var1, Var2, fill = Freq)) +
   geom_tile() +
   scale_fill_gradientn(
-    colors = rev(pals::ocean.speed(100)[1:70]) 
+    colors = rev(pals::ocean.amp(100)[1:80]) 
   ) +
   theme_classic() +
   theme(
-    plot.margin = unit(c(2, 8, 5, 8), "mm"),
+    plot.margin = unit(c(2, 2, 2, 2), "mm"),
     axis.title.x = element_text(size = 24, face = "bold"),
     axis.title.y = element_text(size = 24, face = "bold"),
     axis.text.x = element_text(size = 23, face = "bold"),
