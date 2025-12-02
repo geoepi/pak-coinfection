@@ -1,8 +1,8 @@
-# FMDV co-infection and recombination  
+# FMDV Co-Infection and Recombination  
 Analysis of FMDV co-infection in serially sampled water buffalo.    
-https://geoepi.github.io/pak-coinfection/  
+Web version:  https://geoepi.github.io/pak-coinfection/  
    
-  
+    
 ## Work supporting the publication: 
 ### Foot-and-mouth disease virus variability and recombination on dairy farms in Pakistan      
 **Ian Fish, Carolina Stenfeldt, Umer Farooq, John Humphreys, Zaheer Ahmed, Jonathan Arzt**     

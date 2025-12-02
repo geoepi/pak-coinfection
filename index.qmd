@@ -1,5 +1,5 @@
 ---
-title: "Overview"
+title: "Supporting Information"
 description: "FMDV co-infection and recombination in Asian water buffalo"
 format:
   html: 
@@ -33,10 +33,13 @@ pre {
 </style>
 ```
 
-::: {.callout-important icon=true}
-#### Under Active Development    
-
-The tabs across the top of this webpage can be navigated to view various exploratory analyses examining FMDV co-infection and recombination dynamics in water buffalo.The code, data, and analyses on this site have not been verified or validated and are subject to change.  
-  
-::: 
+#### Foot-and-mouth disease virus variability and recombination on dairy farms in Pakistan  
+Ian Fish, Carolina Stenfeldt, Umer Farooq, John Humphreys, Zaheer Ahmed, Jonathan Arzt     
+Infection, Genetics and Evolution. Volume 136, 2025.          
+[https://doi.org/10.1016/j.meegid.2025.105858](https://doi.org/10.1016/j.meegid.2025.105858)            
+   
+      
+### Navigation
+The tabs across the top of this webpage can be selected to view various analyses examining FMDV co-infection and recombination dynamics in water buffalo.    
+   
   

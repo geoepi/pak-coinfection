@@ -71,8 +71,11 @@ source_dir(here("R"))
 
 ## Revise Nexus Files  
 The function *nexus_label_swap()* edits the Nexus file to move the descriptive text with each sample to the label position to be shown as tip labels.  The revised file is saved with a `_rev` added to the end.    
-```{r eval=FALSE}
+```{r eval=TRUE}
 tree_files <- list.files(here("local/paktrees/original"))
+```
+
+```{r eval=FALSE}
 
 # swap labels
 for(i in 1:length(tree_files)){

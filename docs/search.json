@@ -4,7 +4,7 @@
     "href": "preprocessing.html#revise-nexus-files",
     "title": "Preprocessing",
     "section": "Revise Nexus Files",
-    "text": "Revise Nexus Files\nThe function nexus_label_swap() edits the Nexus file to move the descriptive text with each sample to the label position to be shown as tip labels. The revised file is saved with a _rev added to the end.\n\n\nHide code\ntree_files <- list.files(here(\"local/paktrees/original\"))\n\n# swap labels\nfor(i in 1:length(tree_files)){\n  nexus_label_swap(here(\"local/paktrees/original/\", tree_files[i]))\n}\n\n\n\nView Tree\nTree visualization to confirm nexus_label_swap() worked\n\n\nHide code\n# list of revised nexus files\ntree_files <- list.files(here(\"local/paktrees/original\"), pattern=\"_rev\\\\.nex$\")\n\n# choose a tree\ntree_tmp <- read.nexus(here(\"local/paktrees/original\", tree_files[4]))\n\n\n\n\nHide code\nplot_tree_serotype(tree_tmp)\n\n\n\n\n\nFigure 1: Figure is only a test plot to verify labels were correctly swapped in the Nexus file, but represents Segment 3D."
+    "text": "Revise Nexus Files\nThe function nexus_label_swap() edits the Nexus file to move the descriptive text with each sample to the label position to be shown as tip labels. The revised file is saved with a _rev added to the end.\n\n\nHide code\ntree_files <- list.files(here(\"local/paktrees/original\"))\n\n\n\n\nHide code\n# swap labels\nfor(i in 1:length(tree_files)){\n  nexus_label_swap(here(\"local/paktrees/original/\", tree_files[i]))\n}\n\n\n\nView Tree\nTree visualization to confirm nexus_label_swap() worked\n\n\nHide code\n# list of revised nexus files\ntree_files <- list.files(here(\"local/paktrees/original\"), pattern=\"_rev\\\\.nex$\")\n\n# choose a tree\ntree_tmp <- read.nexus(here(\"local/paktrees/original\", tree_files[4]))\n\n\n\n\nHide code\nplot_tree_serotype(tree_tmp)\n\n\n\n\n\nFigure 1: Figure is only a test plot to verify labels were correctly swapped in the Nexus file, but represents Segment 3D."
   },
   {
     "objectID": "preprocessing.html#geography",
@@ -93,9 +93,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Overview",
+    "title": "Supporting Information",
     "section": "",
-    "text": "Under Active Development\n\n\n\nThe tabs across the top of this webpage can be navigated to view various exploratory analyses examining FMDV co-infection and recombination dynamics in water buffalo.The code, data, and analyses on this site have not been verified or validated and are subject to change."
+    "text": "Foot-and-mouth disease virus variability and recombination on dairy farms in Pakistan\nIan Fish, Carolina Stenfeldt, Umer Farooq, John Humphreys, Zaheer Ahmed, Jonathan Arzt\nInfection, Genetics and Evolution. Volume 136, 2025.\nhttps://doi.org/10.1016/j.meegid.2025.105858\n\n\nNavigation\nThe tabs across the top of this webpage can be selected to view various analyses examining FMDV co-infection and recombination dynamics in water buffalo."
   },
   {
     "objectID": "time_tree.html#serotype-a",
