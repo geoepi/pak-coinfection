@@ -1,6 +1,6 @@
 ---
 title: "Supporting Information"
-description: "FMDV co-infection and recombination in Asian water buffalo"
+description: " "
 format:
   html: 
     df-print: kable
