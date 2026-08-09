@@ -1,0 +1,26 @@
+schema_version: 1
+
+project_id: fmd-patho
+subproject_id: pak-coinfection
+
+title: FMDV Co-Infection and Recombination
+summary: >
+  Foot-and-mouth disease virus variability and recombination on dairy farms in Pakistan.
+
+lead:
+  name: John Humphreys
+  github: JMHumphreys
+
+status: complete
+current_focus: Rsults published. Paper and bioinfomatics lead was Ian Fish, transmission and supporting analyses by Humphreys.
+
+repository:
+  canonical: geoepi/pak-coinfection
+  upstream: null
+
+compute:
+  - Atlas
+
+next_milestone:
+  description: Completed
+  target: 2025-12-20
